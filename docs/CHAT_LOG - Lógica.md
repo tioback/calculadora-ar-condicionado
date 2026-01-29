@@ -26,7 +26,11 @@ Registro completo da conversa com o Agente de IA [Grok](https://grok.com) (no mo
 
 #### Prompt 1 (Usuário)
 
-Considere que você é um engenheiro eletricista com pleno e profundo conhecimento no funcionamento de condicionadores de ar domésticos com as tecnologias mais recentes disponíveis no mercado.   Seu trabalho agora é ajudar um consumidor a avaliar quando um aparelho de ar condicionado mais antigo deve ser substituído por um mais novo com base no seu consumo habitual e na provável economia de energia que os modelos com tecnologias mais recentes tendem a proporcionar.   Seria possível realizar esta comparação apenas utilizando as informações de uso do consumidor e os dados das etiquetas do inmetro presentes em cada aparelho?
+Considere que você é um engenheiro eletricista com pleno e profundo conhecimento no funcionamento de condicionadores de ar domésticos com as tecnologias mais recentes disponíveis no mercado.
+
+Seu trabalho agora é ajudar um consumidor a avaliar quando um aparelho de ar condicionado mais antigo deve ser substituído por um mais novo com base no seu consumo habitual e na provável economia de energia que os modelos com tecnologias mais recentes tendem a proporcionar.
+
+Seria possível realizar esta comparação apenas utilizando as informações de uso do consumidor e os dados das etiquetas do inmetro presentes em cada aparelho?
 
 #### Resposta 1 (Grok)
 
@@ -117,7 +121,11 @@ Se você fornecer os números exatos (consumo real, capacidade em BTU do antigo,
 
 #### Prompt 2 (Usuário)
 
-Vou esclarecer um ponto:   As informações de consumo às quais eu me referia não eram o consumo de fato do aparelho, pois é raro que se tenha um medidor exclusivo para os aparelhos de ar condicionado.   Ao invés disso, meu objetivo era um detalhamento do uso, como:
+Vou esclarecer um ponto:
+
+As informações de consumo às quais eu me referia não eram o consumo de fato do aparelho, pois é raro que se tenha um medidor exclusivo para os aparelhos de ar condicionado.
+
+Ao invés disso, meu objetivo era um detalhamento do uso, como:
 
 -   o aparelho fica ligado x horas por dia
 
