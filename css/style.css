@@ -1,29 +1,43 @@
 :root {
-  --bg: #fff;
-  --text: #000;
-  --accent: #007bff;
-  --error: #dc3545;
+  --bg: #f8f9fa;
+  --text: #212529;
+  --primary: #0056b3;
+  --success: #28a745;
+  --warning: #ffc107;
+  --danger: #dc3545;
+  --border: #dee2e6;
+  --shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 body.dark {
-  --bg: #121212;
+  --bg: #1e1e1e;
   --text: #e0e0e0;
-  --accent: #4da6ff;
+  --primary: #4da6ff;
+  --border: #444;
 }
 body {
-  font-family: system-ui, sans-serif;
+  font-family: system-ui, -apple-system, sans-serif;
   background: var(--bg);
   color: var(--text);
   margin: 0;
   padding: 20px;
-  line-height: 1.5;
+  line-height: 1.6;
 }
-header { display: flex; justify-content: space-between; align-items: center; }
-h1, h2 { margin: 0.5em 0; }
-section { margin: 1em 0; padding: 1em; border: 1px solid #ccc; border-radius: 8px; }
-label { display: block; margin: 0.5em 0; }
-input, select { padding: 0.5em; width: 200px; }
-button { padding: 0.75em 1.5em; margin: 0.5em; background: var(--accent); color: white; border: none; cursor: pointer; }
+header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2em; }
+h1 { margin: 0; font-size: 1.8em; }
+h2 { margin: 0.5em 0; font-size: 1.3em; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5em; }
+fieldset { border: 1px solid var(--border); border-radius: 8px; padding: 1.5em; background: white; box-shadow: var(--shadow); }
+body.dark fieldset { background: #2c2c2c; }
+legend { font-weight: bold; padding: 0 0.5em; background: var(--bg); }
+label { display: flex; flex-direction: column; margin: 1em 0; }
+input, select { padding: 0.75em; border: 1px solid var(--border); border-radius: 4px; font-size: 1em; }
+input:invalid { border-color: var(--danger); }
+.actions { grid-column: 1 / -1; text-align: center; }
+button { padding: 0.8em 1.5em; background: var(--primary); color: white; border: none; border-radius: 4px; cursor: pointer; margin: 0.5em; }
 button:hover { opacity: 0.9; }
-#output { white-space: pre-wrap; font-weight: bold; }
-.error { color: var(--error); }
-canvas { max-width: 100%; margin-top: 1em; }
+.card { background: white; border-radius: 8px; padding: 1.5em; box-shadow: var(--shadow); grid-column: 1 / -1; }
+body.dark .card { background: #2c2c2c; }
+#output { white-space: pre-wrap; }
+#output strong { color: var(--success); }
+#output .high { color: var(--danger); }
+canvas { max-width: 100%; }
