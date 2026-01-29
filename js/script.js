@@ -140,9 +140,11 @@ const elementos = {
   textoTema: document.getElementById('themeText'),
   iconSun: document.getElementById('iconSun'),
   iconMoon: document.getElementById('iconMoon'),
+  memoriaToggle: document.getElementById('toggleMemoria'),
   
   // Saída
   output: document.getElementById('output'),
+  memoriaConteudo: document.getElementById('memoriaConteudo'),
   canvasGrafico: document.getElementById('graficoPayback'),
 };
 
@@ -283,6 +285,7 @@ function resetarDados() {
   // Limpa resultados
   elementos.output.innerHTML = '<p class="placeholder-text">Preencha os dados acima e clique em "Calcular Economia" para ver os resultados.</p>';
   elementos.btnExportarPdf.disabled = true;
+  resetarMemoriaCalculo();
   
   // Destrói gráfico se existir
   if (graficoAtual) {
@@ -513,6 +516,140 @@ function gerarMensagemResultados(resultados) {
 }
 
 /**
+ * Gera memória de cálculo detalhada
+ * @param {Object} resultados
+ * @returns {string}
+ */
+function gerarMemoriaCalculo(resultados) {
+  const {
+    consumoAntigo,
+    consumoNovo,
+    economiaKwh,
+    economiaReais,
+    payback,
+    fatores,
+    dadosAntigo,
+    precoKwh,
+    custoNovo
+  } = resultados;
+
+  const tempMin = parseFloat(document.getElementById('tempMin').value) || 25;
+  const tempMax = parseFloat(document.getElementById('tempMax').value) || 35;
+  const setpoint = parseFloat(document.getElementById('setpoint').value) || 24;
+
+  const horasAno = fatores.horasDia * 30 * fatores.mesesAno;
+  const tipoAntigo = document.getElementById('tipoAntigo').value;
+  const btuAntigo = parseInt(document.getElementById('btuAntigo').value) || 12000;
+  const classeAntigo = document.getElementById('classeAntigo').value || 'C';
+
+  const tipoNovo = document.getElementById('tipoNovo').value;
+  const btuNovo = parseInt(document.getElementById('btuNovo').value) || 12000;
+  const classeNovo = document.getElementById('classeNovo').value || 'C';
+
+  const consumoInformadoAntigo = parseFloat(document.getElementById('consumoAntigo').value);
+  const unidadeAntigo = document.getElementById('unidadeAntigo').value;
+  const consumoInformadoNovo = parseFloat(document.getElementById('consumoNovo').value);
+  const unidadeNovo = document.getElementById('unidadeNovo').value;
+
+  const baseAntigoInformado = padronizarConsumoAnual(consumoInformadoAntigo, unidadeAntigo);
+  const baseNovoInformado = padronizarConsumoAnual(consumoInformadoNovo, unidadeNovo);
+
+  const consumoBaseAntigo = baseAntigoInformado || obterConsumoPadraoAnual(btuAntigo, tipoAntigo, classeAntigo);
+  const consumoBaseNovo = baseNovoInformado || obterConsumoPadraoAnual(btuNovo, tipoNovo, classeNovo);
+
+  const limpeza = document.getElementById('limpezaAntigo').value;
+  const manutencao = document.getElementById('manutencaoAntigo').value;
+  const fatorLimpeza = limpeza === 'pendente' ? FATORES_AJUSTE.LIMPEZA_PENDENTE : 1.0;
+  const fatorManut = manutencao === 'pendente' ? FATORES_AJUSTE.MANUTENCAO_PENDENTE : 1.0;
+
+  const consumoAjustadoAntigo = consumoBaseAntigo
+    * fatores.fatorHoras
+    * fatores.fatorTemperatura
+    * fatores.fatorDeltaT
+    * dadosAntigo.fatorDegradacao
+    * dadosAntigo.fatorManutencao;
+
+  const consumoAjustadoNovo = consumoBaseNovo
+    * fatores.fatorHoras
+    * fatores.fatorTemperatura
+    * fatores.fatorDeltaT;
+
+  const paybackTexto = payback === Infinity || payback > 50
+    ? '>50 anos (não compensa)'
+    : `${payback.toFixed(1)} anos`;
+
+  let html = '<div class="memoria-detalhada">';
+
+  html += '<h3>1. Entradas e conversões</h3>';
+  html += '<ul>';
+  html += `<li>Horas por ano = ${fatores.horasDia} h/dia × ${fatores.mesesAno} meses × 30 = ${formatarNumero(horasAno)} h/ano</li>`;
+  html += `<li>Temperatura média externa = (${tempMin} + ${tempMax}) ÷ 2 = ${fatores.tempMediaExterna.toFixed(1)} °C</li>`;
+  html += `<li>Delta T real = ${fatores.tempMediaExterna.toFixed(1)} - ${setpoint} = ${fatores.deltaTReal.toFixed(1)} °C</li>`;
+  html += '</ul>';
+
+  html += '<h3>2. Fatores aplicados</h3>';
+  html += '<ul>';
+  html += `<li>Fator de horas = ${formatarNumero(horasAno)} ÷ ${FATORES_AJUSTE.TESTE_INMETRO.HORAS_ANO} = ${fatores.fatorHoras.toFixed(2)}x</li>`;
+  html += `<li>Fator delta T = ${Math.max(fatores.deltaTReal, 0).toFixed(1)} ÷ ${FATORES_AJUSTE.TESTE_INMETRO.DELTA_T} = ${fatores.fatorDeltaT.toFixed(2)}x</li>`;
+  html += `<li>Fator temperatura = clamp(0,5–1,5, 1 + (${fatores.tempMediaExterna.toFixed(1)} - ${FATORES_AJUSTE.TESTE_INMETRO.TEMP_EXTERNA}) × 0,015) = ${fatores.fatorTemperatura.toFixed(2)}x</li>`;
+  if (dadosAntigo.idade > 2) {
+    const taxa = FATORES_AJUSTE.DEGRADACAO_TAXA[dadosAntigo.tipo] || 0;
+    html += `<li>Fator degradação = 1 + (${dadosAntigo.idade} - 2) × ${taxa.toFixed(2)} = ${dadosAntigo.fatorDegradacao.toFixed(2)}x</li>`;
+  } else {
+    html += `<li>Fator degradação = ${dadosAntigo.fatorDegradacao.toFixed(2)}x</li>`;
+  }
+  html += `<li>Fator manutenção = ${fatorLimpeza.toFixed(2)} × ${fatorManut.toFixed(2)} = ${dadosAntigo.fatorManutencao.toFixed(2)}x</li>`;
+  html += '</ul>';
+
+  html += '<h3>3. Consumo anual</h3>';
+  html += '<ul>';
+  html += `<li>Consumo base (antigo) = ${formatarNumero(consumoBaseAntigo)} kWh/ano</li>`;
+  html += `<li>Consumo ajustado (antigo) = ${formatarNumero(consumoAjustadoAntigo)} kWh/ano</li>`;
+  html += `<li>Consumo base (novo) = ${formatarNumero(consumoBaseNovo)} kWh/ano</li>`;
+  html += `<li>Consumo ajustado (novo) = ${formatarNumero(consumoAjustadoNovo)} kWh/ano</li>`;
+  html += '</ul>';
+
+  html += '<h3>4. Economia e payback</h3>';
+  html += '<ul>';
+  html += `<li>Economia anual = ${formatarNumero(consumoAntigo)} - ${formatarNumero(consumoNovo)} = ${formatarNumero(economiaKwh)} kWh</li>`;
+  html += `<li>Economia em R$ = ${formatarNumero(economiaKwh)} × ${precoKwh.toFixed(2)} = ${formatarMoeda(economiaReais)}</li>`;
+  html += `<li>Payback = ${formatarMoeda(custoNovo)} ÷ ${formatarMoeda(economiaReais)} = ${paybackTexto}</li>`;
+  html += '</ul>';
+
+  html += '</div>';
+  return html;
+}
+
+function alternarMemoriaCalculo() {
+  if (!elementos.memoriaConteudo || !elementos.memoriaToggle) return;
+
+  const oculto = elementos.memoriaConteudo.hasAttribute('hidden');
+  const textoBotao = elementos.memoriaToggle.querySelector('.btn-text');
+
+  if (oculto) {
+    elementos.memoriaConteudo.removeAttribute('hidden');
+    elementos.memoriaToggle.setAttribute('aria-expanded', 'true');
+    if (textoBotao) textoBotao.textContent = 'Ocultar memória de cálculo';
+  } else {
+    elementos.memoriaConteudo.setAttribute('hidden', '');
+    elementos.memoriaToggle.setAttribute('aria-expanded', 'false');
+    if (textoBotao) textoBotao.textContent = 'Ver memória de cálculo';
+  }
+}
+
+function resetarMemoriaCalculo() {
+  if (!elementos.memoriaConteudo || !elementos.memoriaToggle) return;
+
+  elementos.memoriaConteudo.innerHTML = '<p class="placeholder-text">Calcule a economia para gerar a memória de cálculo.</p>';
+  elementos.memoriaConteudo.setAttribute('hidden', '');
+  elementos.memoriaToggle.setAttribute('aria-expanded', 'false');
+  elementos.memoriaToggle.disabled = true;
+
+  const textoBotao = elementos.memoriaToggle.querySelector('.btn-text');
+  if (textoBotao) textoBotao.textContent = 'Ver memória de cálculo';
+}
+
+/**
  * Função principal de cálculo e exibição de resultados
  */
 function calcularEconomia() {
@@ -572,6 +709,10 @@ function calcularEconomia() {
     // Exibe resultados
     elementos.output.innerHTML = gerarMensagemResultados(resultados);
     elementos.btnExportarPdf.disabled = false;
+    if (elementos.memoriaConteudo) {
+      elementos.memoriaConteudo.innerHTML = gerarMemoriaCalculo(resultados);
+      elementos.memoriaToggle.disabled = false;
+    }
     
     // Gera gráfico de sensibilidade
     gerarGraficoSensibilidade(resultados);
@@ -1287,9 +1428,151 @@ function exportarParaPDF() {
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(...corTextoClaro);
     doc.text('Calculadora de Economia em Ar-Condicionado', 105, 285, { align: 'center' });
-    doc.text('Página 1 de 2', margemDir, 285, { align: 'right' });
-    
-    // ===== PÁGINA 2: GRÁFICO EM LANDSCAPE =====
+    doc.text('Página 1 de 3', margemDir, 285, { align: 'right' });
+
+    // ===== PÁGINA 2: MEMÓRIA DE CÁLCULO (RETRATO) =====
+    doc.addPage('a4', 'portrait');
+
+    doc.setFillColor(...corPrimaria);
+    doc.rect(0, 0, 210, 35, 'F');
+
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(20);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Memória de Cálculo', margemEsq, 15);
+    doc.setFontSize(14);
+    doc.text('Detalhamento das fórmulas e etapas', margemEsq, 23);
+
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Gerado em: ${dataAtual}`, margemEsq, 30);
+
+    let yMem = 45;
+    doc.setTextColor(...corTexto);
+
+    const fatoresMemoria = calcularFatoresAjuste();
+    const precoKwhMemoria = parseFloat(document.getElementById('precoKwh').value) || 0.90;
+    const custoNovoMemoria = parseFloat(document.getElementById('custoNovo').value) || 5000;
+    const consumoAntigoMemoria = calcularConsumoReal('Antigo', fatoresMemoria);
+    const consumoNovoMemoria = calcularConsumoReal('Novo', fatoresMemoria);
+    const economiaKwhMemoria = consumoAntigoMemoria - consumoNovoMemoria;
+    const economiaReaisMemoria = economiaKwhMemoria * precoKwhMemoria;
+    const paybackMemoria = economiaReaisMemoria > 0 ? custoNovoMemoria / economiaReaisMemoria : Infinity;
+
+    const tempMin = parseFloat(document.getElementById('tempMin').value) || 25;
+    const tempMax = parseFloat(document.getElementById('tempMax').value) || 35;
+    const setpoint = parseFloat(document.getElementById('setpoint').value) || 24;
+    const horasAno = fatoresMemoria.horasDia * 30 * fatoresMemoria.mesesAno;
+
+    const tipoAntigo = document.getElementById('tipoAntigo').value;
+    const btuAntigo = parseInt(document.getElementById('btuAntigo').value) || 12000;
+    const classeAntigo = document.getElementById('classeAntigo').value || 'C';
+    const tipoNovo = document.getElementById('tipoNovo').value;
+    const btuNovo = parseInt(document.getElementById('btuNovo').value) || 12000;
+    const classeNovo = document.getElementById('classeNovo').value || 'C';
+
+    const consumoInformadoAntigo = parseFloat(document.getElementById('consumoAntigo').value);
+    const unidadeAntigo = document.getElementById('unidadeAntigo').value;
+    const consumoInformadoNovo = parseFloat(document.getElementById('consumoNovo').value);
+    const unidadeNovo = document.getElementById('unidadeNovo').value;
+
+    const baseAntigoInformado = padronizarConsumoAnual(consumoInformadoAntigo, unidadeAntigo);
+    const baseNovoInformado = padronizarConsumoAnual(consumoInformadoNovo, unidadeNovo);
+    const consumoBaseAntigo = baseAntigoInformado || obterConsumoPadraoAnual(btuAntigo, tipoAntigo, classeAntigo);
+    const consumoBaseNovo = baseNovoInformado || obterConsumoPadraoAnual(btuNovo, tipoNovo, classeNovo);
+
+    const idadeAntigo = parseFloat(document.getElementById('idadeAntigo').value) || 0;
+    const limpeza = document.getElementById('limpezaAntigo').value;
+    const manutencao = document.getElementById('manutencaoAntigo').value;
+    const taxaDegradacao = FATORES_AJUSTE.DEGRADACAO_TAXA[tipoAntigo] || 0.04;
+    const fatorDegradacao = idadeAntigo > 2 ? 1 + (idadeAntigo - 2) * taxaDegradacao : 1;
+    const fatorLimpeza = limpeza === 'pendente' ? FATORES_AJUSTE.LIMPEZA_PENDENTE : 1.0;
+    const fatorManut = manutencao === 'pendente' ? FATORES_AJUSTE.MANUTENCAO_PENDENTE : 1.0;
+    const fatorManutencao = fatorLimpeza * fatorManut;
+
+    const consumoAjustadoAntigo = consumoBaseAntigo
+      * fatoresMemoria.fatorHoras
+      * fatoresMemoria.fatorTemperatura
+      * fatoresMemoria.fatorDeltaT
+      * fatorDegradacao
+      * fatorManutencao;
+
+    const consumoAjustadoNovo = consumoBaseNovo
+      * fatoresMemoria.fatorHoras
+      * fatoresMemoria.fatorTemperatura
+      * fatoresMemoria.fatorDeltaT;
+
+    const paybackTextoMemoria = paybackMemoria === Infinity || paybackMemoria > 50
+      ? '>50 anos (não compensa)'
+      : `${paybackMemoria.toFixed(1)} anos`;
+
+    const desenharTituloMemoria = (titulo) => {
+      doc.setFontSize(12);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(...corPrimaria);
+      doc.text(titulo, margemEsq, yMem);
+      yMem += 4;
+      doc.setDrawColor(...corPrimaria);
+      doc.setLineWidth(0.5);
+      doc.line(margemEsq, yMem, margemDir, yMem);
+      yMem += 5;
+    };
+
+    const desenharItensMemoria = (itens) => {
+      doc.setFontSize(9);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(...corTexto);
+      itens.forEach((item) => {
+        const linhas = doc.splitTextToSize(`• ${item}`, larguraUtil - 4);
+        doc.text(linhas, margemEsq + 2, yMem);
+        yMem += linhas.length * 4;
+      });
+      yMem += 2;
+    };
+
+    desenharTituloMemoria('1. Entradas e conversões');
+    desenharItensMemoria([
+      `Horas por ano = ${fatoresMemoria.horasDia} h/dia × ${fatoresMemoria.mesesAno} meses × 30 = ${formatarNumero(horasAno)} h/ano`,
+      `Temperatura média externa = (${tempMin} + ${tempMax}) ÷ 2 = ${fatoresMemoria.tempMediaExterna.toFixed(1)} °C`,
+      `Delta T real = ${fatoresMemoria.tempMediaExterna.toFixed(1)} - ${setpoint} = ${fatoresMemoria.deltaTReal.toFixed(1)} °C`
+    ]);
+
+    desenharTituloMemoria('2. Fatores aplicados');
+    desenharItensMemoria([
+      `Fator de horas = ${formatarNumero(horasAno)} ÷ ${FATORES_AJUSTE.TESTE_INMETRO.HORAS_ANO} = ${fatoresMemoria.fatorHoras.toFixed(2)}x`,
+      `Fator delta T = ${Math.max(fatoresMemoria.deltaTReal, 0).toFixed(1)} ÷ ${FATORES_AJUSTE.TESTE_INMETRO.DELTA_T} = ${fatoresMemoria.fatorDeltaT.toFixed(2)}x`,
+      `Fator temperatura = clamp(0,5–1,5, 1 + (${fatoresMemoria.tempMediaExterna.toFixed(1)} - ${FATORES_AJUSTE.TESTE_INMETRO.TEMP_EXTERNA}) × 0,015) = ${fatoresMemoria.fatorTemperatura.toFixed(2)}x`,
+      `Fator degradação = ${fatorDegradacao.toFixed(2)}x`,
+      `Fator manutenção = ${fatorLimpeza.toFixed(2)} × ${fatorManut.toFixed(2)} = ${fatorManutencao.toFixed(2)}x`
+    ]);
+
+    desenharTituloMemoria('3. Consumo anual');
+    desenharItensMemoria([
+      `Consumo base (antigo) = ${formatarNumero(consumoBaseAntigo)} kWh/ano`,
+      `Consumo ajustado (antigo) = ${formatarNumero(consumoAjustadoAntigo)} kWh/ano`,
+      `Consumo base (novo) = ${formatarNumero(consumoBaseNovo)} kWh/ano`,
+      `Consumo ajustado (novo) = ${formatarNumero(consumoAjustadoNovo)} kWh/ano`
+    ]);
+
+    desenharTituloMemoria('4. Economia e payback');
+    desenharItensMemoria([
+      `Economia anual = ${formatarNumero(consumoAntigoMemoria)} - ${formatarNumero(consumoNovoMemoria)} = ${formatarNumero(economiaKwhMemoria)} kWh`,
+      `Economia em R$ = ${formatarNumero(economiaKwhMemoria)} × ${precoKwhMemoria.toFixed(2)} = ${formatarMoeda(economiaReaisMemoria)}`,
+      `Payback = ${formatarMoeda(custoNovoMemoria)} ÷ ${formatarMoeda(economiaReaisMemoria)} = ${paybackTextoMemoria}`
+    ]);
+
+    // Rodapé da página 2
+    doc.setDrawColor(200, 200, 200);
+    doc.setLineWidth(0.3);
+    doc.line(margemEsq, 280, margemDir, 280);
+
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(...corTextoClaro);
+    doc.text('Calculadora de Economia em Ar-Condicionado', 105, 285, { align: 'center' });
+    doc.text('Página 2 de 3', margemDir, 285, { align: 'right' });
+
+    // ===== PÁGINA 3: GRÁFICO EM LANDSCAPE =====
     doc.addPage('a4', 'landscape');
     
     // Cabeçalho página 2
@@ -1333,7 +1616,7 @@ function exportarParaPDF() {
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(...corTextoClaro);
     doc.text('Calculadora de Economia em Ar-Condicionado', 148.5, 200, { align: 'center' });
-    doc.text('Página 2 de 2', 277, 200, { align: 'right' });
+    doc.text('Página 3 de 3', 277, 200, { align: 'right' });
     
     // Salva o PDF
     const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
@@ -1364,6 +1647,9 @@ function inicializar() {
   elementos.btnExportarPdf.addEventListener('click', exportarParaPDF);
   elementos.btnToggleTema.addEventListener('click', alternarTema);
   elementos.btnResetData.addEventListener('click', resetarDados);
+  if (elementos.memoriaToggle) {
+    elementos.memoriaToggle.addEventListener('click', alternarMemoriaCalculo);
+  }
   
   // Auto-salvar dados ao alterar campos
   CAMPOS_FORMULARIO.forEach(campo => {
@@ -1372,6 +1658,8 @@ function inicializar() {
       elemento.addEventListener('change', salvarDadosFormulario);
     }
   });
+
+  resetarMemoriaCalculo();
   
   console.info('✅ Calculadora de Ar-Condicionado inicializada com sucesso!');
 }

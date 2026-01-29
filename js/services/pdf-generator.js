@@ -5,7 +5,14 @@
  */
 
 import { PDF_CONFIG, YPositionManager } from '../config/pdf-config.js';
-import { formatarNumero, gerarTimestamp } from '../utils/formatters.js';
+import { formatarNumero, formatarMoeda, gerarTimestamp, obterConsumoPadraoAnual } from '../utils/formatters.js';
+import { FATORES_AJUSTE } from '../config/constants.js';
+import {
+  calcularFatoresAjuste,
+  calcularConsumoReal,
+  calcularEconomiaEPayback,
+  obterDadosAparelhoAntigo
+} from './calculations.js';
 import {
   desenharCabecalho,
   desenharTituloSecao,
@@ -222,10 +229,13 @@ export function exportarParaPDF(graficoAtual) {
     doc.text(linhasDisclaimer, LAYOUT.marginLeft + 2, yManager.current);
     
     // ===== RODAPÉ PÁGINA 1 =====
-    desenharRodape(doc, 1, 2);
-    
-    // ===== PÁGINA 2: GRÁFICO =====
-    gerarPagina2Grafico(doc, graficoAtual);
+    desenharRodape(doc, 1, 3);
+
+    // ===== PÁGINA 2: MEMÓRIA DE CÁLCULO =====
+    gerarPaginaMemoriaCalculo(doc, dataAtual);
+
+    // ===== PÁGINA 3: GRÁFICO =====
+    gerarPagina2Grafico(doc, graficoAtual, 3, 3);
     
     // Salva o PDF
     doc.save(`relatorio-ar-condicionado-${gerarTimestamp()}.pdf`);
@@ -240,7 +250,7 @@ export function exportarParaPDF(graficoAtual) {
 /**
  * Gera página 2 com o gráfico em landscape
  */
-function gerarPagina2Grafico(doc, graficoAtual) {
+function gerarPagina2Grafico(doc, graficoAtual, paginaAtual = 2, totalPaginas = 2) {
   const { COLORS, FONTS, PAGE2 } = PDF_CONFIG;
   
   doc.addPage('a4', 'landscape');
@@ -281,5 +291,104 @@ function gerarPagina2Grafico(doc, graficoAtual) {
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(...COLORS.textLight);
   doc.text('Calculadora de Economia em Ar-Condicionado', 148.5, PAGE2.footerTextY, { align: 'center' });
-  doc.text('Página 2 de 2', 277, PAGE2.footerTextY, { align: 'right' });
+  doc.text(`Página ${paginaAtual} de ${totalPaginas}`, 277, PAGE2.footerTextY, { align: 'right' });
+}
+
+function gerarPaginaMemoriaCalculo(doc, dataAtual) {
+  const { COLORS, FONTS, LAYOUT, SPACING } = PDF_CONFIG;
+
+  doc.addPage('a4', 'portrait');
+  desenharCabecalho(doc, 'Memória de Cálculo', 'Detalhamento das fórmulas e etapas', dataAtual);
+
+  const yManager = new YPositionManager(SPACING.afterHeader);
+  doc.setTextColor(...COLORS.text);
+
+  const fatores = calcularFatoresAjuste();
+  const dadosAntigo = obterDadosAparelhoAntigo();
+  const consumoAntigo = calcularConsumoReal('Antigo', fatores);
+  const consumoNovo = calcularConsumoReal('Novo', fatores);
+  const { economiaKwh, economiaReais, payback, precoKwh, custoNovo } = calcularEconomiaEPayback(consumoAntigo, consumoNovo);
+
+  const tempMin = parseFloat(document.getElementById('tempMin').value) || 25;
+  const tempMax = parseFloat(document.getElementById('tempMax').value) || 35;
+  const setpoint = parseFloat(document.getElementById('setpoint').value) || 24;
+  const horasAno = fatores.horasDia * 30 * fatores.mesesAno;
+
+  const btuAntigo = parseFloat(document.getElementById('btuAntigo').value) || 12000;
+  const tipoAntigo = document.getElementById('tipoAntigo').value;
+  const classeAntigo = document.getElementById('classeAntigo').value || 'C';
+  const btuNovo = parseFloat(document.getElementById('btuNovo').value) || 12000;
+  const tipoNovo = document.getElementById('tipoNovo').value;
+  const classeNovo = document.getElementById('classeNovo').value || 'C';
+
+  const consumoBaseAntigo = obterConsumoPadraoAnual(btuAntigo, tipoAntigo, classeAntigo);
+  const consumoBaseNovo = obterConsumoPadraoAnual(btuNovo, tipoNovo, classeNovo);
+
+  const limpeza = document.getElementById('limpezaAntigo').value;
+  const manutencao = document.getElementById('manutencaoAntigo').value;
+  const fatorLimpeza = limpeza === 'pendente' ? FATORES_AJUSTE.LIMPEZA_PENDENTE : 1.0;
+  const fatorManut = manutencao === 'pendente' ? FATORES_AJUSTE.MANUTENCAO_PENDENTE : 1.0;
+
+  const consumoAjustadoAntigo = consumoBaseAntigo
+    * fatores.fatorHoras
+    * fatores.fatorDeltaT
+    * fatores.fatorTemperatura
+    * dadosAntigo.fatorDegradacao
+    * dadosAntigo.fatorManutencao;
+
+  const consumoAjustadoNovo = consumoBaseNovo
+    * fatores.fatorHoras
+    * fatores.fatorDeltaT
+    * fatores.fatorTemperatura;
+
+  const paybackTexto = payback === Infinity || payback > 50
+    ? '>50 anos (não compensa)'
+    : `${payback.toFixed(1)} anos`;
+
+  const desenharListaMemoria = (itens, yPos) => {
+    doc.setFontSize(FONTS.body);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(...COLORS.text);
+
+    itens.forEach((item) => {
+      const linhas = doc.splitTextToSize(`• ${item}`, LAYOUT.marginWidth - 4);
+      doc.text(linhas, LAYOUT.marginLeft + 2, yPos);
+      yPos += linhas.length * SPACING.betweenItems;
+    });
+
+    return yPos + 2;
+  };
+
+  yManager.set(desenharTituloSecao(doc, '1. Entradas e conversões', yManager.current));
+  yManager.set(desenharListaMemoria([
+    `Horas por ano = ${fatores.horasDia} h/dia × ${fatores.mesesAno} meses × 30 = ${formatarNumero(horasAno)} h/ano`,
+    `Temperatura média externa = (${tempMin} + ${tempMax}) ÷ 2 = ${fatores.tempMediaExterna.toFixed(1)} °C`,
+    `Delta T real = ${fatores.tempMediaExterna.toFixed(1)} - ${setpoint} = ${fatores.deltaTReal.toFixed(1)} °C`
+  ], yManager.current));
+
+  yManager.set(desenharTituloSecao(doc, '2. Fatores aplicados', yManager.current));
+  yManager.set(desenharListaMemoria([
+    `Fator de horas = ${formatarNumero(horasAno)} ÷ ${FATORES_AJUSTE.TESTE_INMETRO.HORAS_ANO} = ${fatores.fatorHoras.toFixed(2)}x`,
+    `Fator delta T = ${fatores.deltaTReal.toFixed(1)} ÷ ${FATORES_AJUSTE.TESTE_INMETRO.DELTA_T} = ${fatores.fatorDeltaT.toFixed(2)}x`,
+    `Fator temperatura = clamp(0,5–1,5, 1 + (${fatores.tempMediaExterna.toFixed(1)} - ${FATORES_AJUSTE.TESTE_INMETRO.TEMP_EXTERNA}) × 0,015) = ${fatores.fatorTemperatura.toFixed(2)}x`,
+    `Fator degradação = ${dadosAntigo.fatorDegradacao.toFixed(2)}x`,
+    `Fator manutenção = ${fatorLimpeza.toFixed(2)} × ${fatorManut.toFixed(2)} = ${dadosAntigo.fatorManutencao.toFixed(2)}x`
+  ], yManager.current));
+
+  yManager.set(desenharTituloSecao(doc, '3. Consumo anual', yManager.current));
+  yManager.set(desenharListaMemoria([
+    `Consumo base (antigo) = ${formatarNumero(consumoBaseAntigo)} kWh/ano`,
+    `Consumo ajustado (antigo) = ${formatarNumero(consumoAjustadoAntigo)} kWh/ano`,
+    `Consumo base (novo) = ${formatarNumero(consumoBaseNovo)} kWh/ano`,
+    `Consumo ajustado (novo) = ${formatarNumero(consumoAjustadoNovo)} kWh/ano`
+  ], yManager.current));
+
+  yManager.set(desenharTituloSecao(doc, '4. Economia e payback', yManager.current));
+  yManager.set(desenharListaMemoria([
+    `Economia anual = ${formatarNumero(consumoAntigo)} - ${formatarNumero(consumoNovo)} = ${formatarNumero(economiaKwh)} kWh`,
+    `Economia em R$ = ${formatarNumero(economiaKwh)} × ${precoKwh.toFixed(2)} = ${formatarMoeda(economiaReais)}`,
+    `Payback = ${formatarMoeda(custoNovo)} ÷ ${formatarMoeda(economiaReais)} = ${paybackTexto}`
+  ], yManager.current));
+
+  desenharRodape(doc, 2, 3);
 }
