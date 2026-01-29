@@ -4,25 +4,25 @@ Registro completo da conversa com o Agente de IA [Grok](https://grok.com) (no mo
 
 ## Índice
 
-- [Troca 1](#troca-1)
-- [Troca 2](#troca-2)
-- [Troca 3](#troca-3)
-- [Troca 4](#troca-4)
-- [Troca 5](#troca-5)
-- [Troca 6](#troca-6)
-- [Troca 7](#troca-7)
-- [Troca 8](#troca-8)
-- [Troca 9](#troca-9)
-- [Troca 10](#troca-10)
-- [Troca 11](#troca-11)
-- [Troca 12](#troca-12)
-- [Troca 13](#troca-13)
-- [Troca 14](#troca-14)
-- [Troca 15](#troca-15)
+- [Bloco 1](#bloco-1) — Viabilidade da comparação
+- [Bloco 2](#bloco-2) — Entradas de uso
+- [Bloco 3](#bloco-3) — Tecnologias do site
+- [Bloco 4](#bloco-4) — Etiquetas e defaults
+- [Bloco 5](#bloco-5) — Implementação completa
+- [Bloco 6](#bloco-6) — Visual e legenda
+- [Bloco 7](#bloco-7) — Degradação e responsivo
+- [Bloco 8](#bloco-8) — Limpeza e manutenção
+- [Bloco 9](#bloco-9) — Arquivos íntegros
+- [Bloco 10](#bloco-10) — Setpoint e delta T
+- [Bloco 11](#bloco-11) — Paths e legenda
+- [Bloco 12](#bloco-12) — Etiqueta 2010
+- [Bloco 13](#bloco-13) — Redução de erro
+- [Bloco 14](#bloco-14) — Regra sentir/experimentar
+- [Bloco 15](#bloco-15) — Ajuste das instruções
 
 ---
 
-### Troca 1
+### Bloco 1
 
 #### Prompt 1 (Usuário)
 
@@ -117,7 +117,7 @@ Se você fornecer os números exatos (consumo real, capacidade em BTU do antigo,
 
 ---
 
-### Troca 2
+### Bloco 2
 
 #### Prompt 2 (Usuário)
 
@@ -217,7 +217,7 @@ Se você fornecer números concretos (ex: horas/dia, área m² total, faixa temp
 
 ---
 
-### Troca 3
+### Bloco 3
 
 #### Prompt 3 (Usuário)
 
@@ -308,7 +308,7 @@ Se quiser, posso descrever o código JS básico para os cálculos (ou até um es
 
 ---
 
-### Troca 4
+### Bloco 4
 
 #### Prompt 4 (Usuário)
 
@@ -445,7 +445,7 @@ Se quiser, forneça preferências exatas de defaults ou campos, e descrevo/esbo�
 
 ---
 
-### Troca 5
+### Bloco 5
 
 #### Prompt 5 (Usuário)
 
@@ -706,7 +706,7 @@ Teste localmente abrindo index.html no navegador. Se precisar de ajustes (ex: ma
 
 ---
 
-### Troca 6
+### Bloco 6
 
 #### Prompt 6 (Usuário)
 
@@ -991,7 +991,7 @@ document.getElementById('exportPdf').addEventListener('click', () => {
 
 ---
 
-### Troca 7
+### Bloco 7
 
 #### Prompt 7 (Usuário)
 
@@ -1110,7 +1110,7 @@ Teste: Com idade 2 anos → fator ~1 (sem penalidade extra). Com 20 anos on-off 
 
 ---
 
-### Troca 8
+### Bloco 8
 
 #### Prompt 8 (Usuário)
 
@@ -1207,7 +1207,7 @@ Processo sistemático: Esses multiplicadores são conservadores e lineares para 
 
 ---
 
-### Troca 9
+### Bloco 9
 
 #### Prompt 9 (Usuário)
 
@@ -1550,7 +1550,7 @@ Esses arquivos são autônomos e devem rodar diretamente ao abrir index.html no 
 
 ---
 
-### Troca 10
+### Bloco 10
 
 #### Prompt 10 (Usuário)
 
@@ -1930,7 +1930,7 @@ Processo sistemático: O fator\_delta é linear em relação ao delta T (proporc
 
 ---
 
-### Troca 11
+### Bloco 11
 
 #### Prompt 11 (Usuário)
 
@@ -2224,7 +2224,7 @@ Substitua apenas esses dois arquivos na sua estrutura de pastas (css/ e js/). O 
 
 ---
 
-### Troca 12
+### Bloco 12
 
 #### Prompt 12 (Usuário)
 
@@ -2272,7 +2272,7 @@ Se quiser, forneça mais dados do seu teste (BTU exato, consumo real observado, 
 
 ---
 
-### Troca 13
+### Bloco 13
 
 #### Prompt 13 (Usuário)
 
@@ -2329,7 +2329,7 @@ Se fornecer os dados do seu teste (BTU, consumo real medido, etc.), posso simula
 
 ---
 
-### Troca 14
+### Bloco 14
 
 #### Prompt 14 (Usuário)
 
@@ -2399,7 +2399,7 @@ Se após configurar o estilo não for seguido em algum chat, pode ser um bug tem
 
 ---
 
-### Troca 15
+### Bloco 15
 
 #### Prompt 15 (Usuário)
 
