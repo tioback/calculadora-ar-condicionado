@@ -41,6 +41,7 @@ body.dark .card { background: #2c2c2c; }
 #output strong { color: var(--success); }
 #output .high { color: var(--danger); }
 canvas { max-width: 100%; }
+
 @media (max-width: 600px) {
   .grid { grid-template-columns: 1fr; }
   input, select { width: 100%; }
