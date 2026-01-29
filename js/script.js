@@ -587,8 +587,12 @@ function calcularEconomia() {
 let graficoAtual = null; // Referência ao gráfico Chart.js
 
 /**
- * Gera gráfico de análise de sensibilidade
- * Mostra como o payback varia com diferentes horas de uso por dia
+ * Gera gráfico de análise de sensibilidade com melhorias avançadas
+ * - Range dinâmico baseado no cenário do usuário
+ * - Marcador visual do cenário atual
+ * - Zonas coloridas (verde/amarelo/vermelho)
+ * - Gráfico dual (payback + economia)
+ * - Tooltip melhorado com recomendações
  * @param {Object} resultados - Resultados do cálculo principal
  */
 function gerarGraficoSensibilidade(resultados) {
@@ -600,11 +604,24 @@ function gerarGraficoSensibilidade(resultados) {
   }
   
   const ctx = elementos.canvasGrafico.getContext('2d');
+  const horasUsuario = fatores.horasDia;
   
-  // Gera pontos para 4 a 12 horas/dia
-  const horasPorDia = Array.from({ length: 9 }, (_, i) => 4 + i);
+  // MELHORIA 1: Range dinâmico baseado nas horas do usuário
+  const horasMin = Math.max(1, Math.floor(horasUsuario * 0.5));
+  const horasMax = Math.min(20, Math.ceil(horasUsuario * 1.8));
+  const numPontos = 10;
+  const step = (horasMax - horasMin) / (numPontos - 1);
   
-  const dadosPayback = horasPorDia.map(horas => {
+  const horasPorDia = [];
+  for (let i = 0; i < numPontos; i++) {
+    horasPorDia.push(Number((horasMin + step * i).toFixed(1)));
+  }
+  
+  // Calcula dados para ambas as métricas
+  const dadosPayback = [];
+  const dadosEconomia = [];
+  
+  horasPorDia.forEach(horas => {
     // Recalcula fator de horas para este cenário
     const horasAno = horas * 30 * fatores.mesesAno;
     const fatorHorasAjustado = horasAno / FATORES_AJUSTE.TESTE_INMETRO.HORAS_ANO;
@@ -618,51 +635,229 @@ function gerarGraficoSensibilidade(resultados) {
     const consumoNovoAjustado = consumoNovoBase * fatorHorasAjustado;
     
     // Calcula economia e payback para este cenário
-    const economia = (consumoAntigoAjustado - consumoNovoAjustado) * precoKwh;
-    return economia > 0 ? custoNovo / economia : 50;
+    const economiaKwh = consumoAntigoAjustado - consumoNovoAjustado;
+    const economiaReais = economiaKwh * precoKwh;
+    
+    // MELHORIA 3C: Limitar payback a 25 anos, depois null
+    let payback = economiaReais > 0 ? custoNovo / economiaReais : null;
+    if (payback !== null && payback > 25) {
+      payback = null;
+    }
+    
+    dadosPayback.push(payback);
+    dadosEconomia.push(economiaReais > 0 ? economiaReais : 0);
   });
+  
+  // Obter cores do tema atual
+  const corPrimaria = getComputedStyle(document.documentElement)
+    .getPropertyValue('--color-primary').trim() || '#0056b3';
+  const corSucesso = getComputedStyle(document.documentElement)
+    .getPropertyValue('--color-success').trim() || '#28a745';
+  const corAviso = getComputedStyle(document.documentElement)
+    .getPropertyValue('--color-warning').trim() || '#ffc107';
+  const corPerigo = getComputedStyle(document.documentElement)
+    .getPropertyValue('--color-danger').trim() || '#dc3545';
+  
+  // MELHORIA 6: Plugin para zonas coloridas de fundo
+  const pluginZonasColoridas = {
+    id: 'zonasColoridas',
+    beforeDraw: (chart) => {
+      const { ctx, chartArea, scales } = chart;
+      if (!chartArea) return;
+      
+      const yScale = scales.y;
+      const xLeft = chartArea.left;
+      const xRight = chartArea.right;
+      
+      // Zona verde: 0-5 anos (ótimo)
+      const y5 = yScale.getPixelForValue(5);
+      const yBottom = chartArea.bottom;
+      ctx.fillStyle = 'rgba(40, 167, 69, 0.08)';
+      ctx.fillRect(xLeft, y5, xRight - xLeft, yBottom - y5);
+      
+      // Zona amarela: 5-8 anos (razoável)
+      const y8 = yScale.getPixelForValue(8);
+      ctx.fillStyle = 'rgba(255, 193, 7, 0.08)';
+      ctx.fillRect(xLeft, y8, xRight - xLeft, y5 - y8);
+      
+      // Zona vermelha: 8+ anos (avaliar)
+      const yTop = chartArea.top;
+      ctx.fillStyle = 'rgba(220, 53, 69, 0.08)';
+      ctx.fillRect(xLeft, yTop, xRight - xLeft, y8 - yTop);
+    }
+  };
   
   // Configuração do gráfico
   graficoAtual = new Chart(ctx, {
     type: 'line',
     data: {
       labels: horasPorDia,
-      datasets: [{
-        label: 'Payback (anos)',
-        data: dadosPayback,
-        borderColor: getComputedStyle(document.documentElement)
-          .getPropertyValue('--color-primary').trim() || '#0056b3',
-        backgroundColor: 'rgba(0, 86, 179, 0.1)',
-        fill: true,
-        tension: 0.3,
-        pointRadius: 5,
-        pointHoverRadius: 7,
-        borderWidth: 2
-      }]
+      datasets: [
+        {
+          label: 'Payback (anos)',
+          data: dadosPayback,
+          borderColor: corPrimaria,
+          backgroundColor: corPrimaria.replace('rgb', 'rgba').replace(')', ', 0.1)'),
+          fill: false,
+          tension: 0.3,
+          pointRadius: 5,
+          pointHoverRadius: 8,
+          borderWidth: 3,
+          yAxisID: 'y',
+          spanGaps: false // Não conecta pontos null
+        },
+        // MELHORIA 5: Segundo dataset com economia anual
+        {
+          label: 'Economia anual (R$)',
+          data: dadosEconomia,
+          borderColor: corSucesso,
+          backgroundColor: corSucesso.replace('rgb', 'rgba').replace(')', ', 0.1)'),
+          fill: false,
+          tension: 0.3,
+          pointRadius: 4,
+          pointHoverRadius: 7,
+          borderWidth: 2,
+          borderDash: [5, 5],
+          yAxisID: 'y1'
+        }
+      ]
     },
     options: {
       responsive: true,
       maintainAspectRatio: true,
+      interaction: {
+        mode: 'index',
+        intersect: false
+      },
       plugins: {
+        // Registra plugin de zonas
+        zonasColoridas: pluginZonasColoridas,
+        
         legend: {
           display: true,
-          position: 'top'
+          position: 'top',
+          labels: {
+            padding: 15,
+            usePointStyle: true,
+            font: {
+              size: 12
+            }
+          }
         },
         title: {
           display: true,
-          text: 'Como as horas de uso diário afetam o tempo de retorno',
+          text: 'Análise de Sensibilidade: Impacto das Horas de Uso',
           font: {
-            size: 14,
-            weight: 'normal'
+            size: 15,
+            weight: '600'
+          },
+          padding: {
+            top: 10,
+            bottom: 15
           }
         },
+        // MELHORIA: Tooltip melhorado com recomendações
         tooltip: {
+          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+          padding: 12,
+          titleFont: { size: 13, weight: 'bold' },
+          bodyFont: { size: 12 },
+          bodySpacing: 6,
           callbacks: {
-            label: function(context) {
+            title: (context) => {
+              return `${context[0].label}h de uso por dia`;
+            },
+            label: (context) => {
+              const datasetLabel = context.dataset.label;
               const valor = context.parsed.y;
-              return valor >= 50 
-                ? 'Payback: >50 anos (não compensa)'
-                : `Payback: ${valor.toFixed(1)} anos`;
+              
+              if (datasetLabel.includes('Payback')) {
+                if (valor === null) {
+                  return 'Payback: Não compensa (>25 anos)';
+                }
+                let emoji = '';
+                let recomendacao = '';
+                if (valor < 5) {
+                  emoji = '✅';
+                  recomendacao = ' - Excelente!';
+                } else if (valor > 8) {
+                  emoji = '⚠️';
+                  recomendacao = ' - Avaliar melhor';
+                } else {
+                  emoji = '✔️';
+                  recomendacao = ' - Razoável';
+                }
+                return `${emoji} Payback: ${valor.toFixed(1)} anos${recomendacao}`;
+              } else {
+                return `💰 Economia: ${formatarMoeda(valor)}/ano`;
+              }
+            },
+            afterBody: (context) => {
+              // Adiciona dica extra no tooltip
+              const horas = parseFloat(context[0].label);
+              if (Math.abs(horas - horasUsuario) < 0.5) {
+                return ['', '👉 Este é o seu cenário atual'];
+              }
+              return [];
+            }
+          }
+        },
+        // MELHORIA 4: Marcador visual do cenário atual
+        annotation: {
+          annotations: {
+            linhaAtual: {
+              type: 'line',
+              xMin: horasUsuario,
+              xMax: horasUsuario,
+              borderColor: corPerigo,
+              borderWidth: 3,
+              borderDash: [6, 3],
+              label: {
+                display: true,
+                content: '⬇ Você está aqui',
+                position: 'start',
+                backgroundColor: corPerigo,
+                color: 'white',
+                font: {
+                  size: 11,
+                  weight: 'bold'
+                },
+                padding: 6,
+                borderRadius: 4
+              }
+            },
+            // Linhas de referência para os limiares
+            linha5anos: {
+              type: 'line',
+              yMin: 5,
+              yMax: 5,
+              borderColor: corSucesso,
+              borderWidth: 1,
+              borderDash: [3, 3],
+              label: {
+                display: true,
+                content: '5 anos',
+                position: 'end',
+                backgroundColor: 'transparent',
+                color: corSucesso,
+                font: { size: 10 }
+              }
+            },
+            linha8anos: {
+              type: 'line',
+              yMin: 8,
+              yMax: 8,
+              borderColor: corAviso,
+              borderWidth: 1,
+              borderDash: [3, 3],
+              label: {
+                display: true,
+                content: '8 anos',
+                position: 'end',
+                backgroundColor: 'transparent',
+                color: corAviso,
+                font: { size: 10 }
+              }
             }
           }
         }
@@ -671,25 +866,69 @@ function gerarGraficoSensibilidade(resultados) {
         x: {
           title: {
             display: true,
-            text: 'Horas de uso por dia'
+            text: 'Horas de uso por dia',
+            font: {
+              size: 12,
+              weight: '600'
+            }
           },
           grid: {
-            color: 'rgba(0, 0, 0, 0.05)'
+            color: 'rgba(0, 0, 0, 0.06)',
+            drawBorder: false
+          },
+          ticks: {
+            font: { size: 11 }
           }
         },
         y: {
+          position: 'left',
           title: {
             display: true,
-            text: 'Tempo de retorno (anos)'
+            text: 'Tempo de retorno (anos)',
+            font: {
+              size: 12,
+              weight: '600'
+            }
           },
           beginAtZero: true,
-          max: Math.min(Math.max(...dadosPayback) * 1.1, 20), // Limita a 20 anos
+          max: 20, // Limitado a 20 anos para melhor visualização
           grid: {
-            color: 'rgba(0, 0, 0, 0.05)'
+            color: 'rgba(0, 0, 0, 0.06)',
+            drawBorder: false
+          },
+          ticks: {
+            font: { size: 11 },
+            callback: function(value) {
+              return value + ' anos';
+            }
+          }
+        },
+        // MELHORIA 5: Segundo eixo Y para economia
+        y1: {
+          position: 'right',
+          title: {
+            display: true,
+            text: 'Economia anual (R$)',
+            font: {
+              size: 12,
+              weight: '600'
+            }
+          },
+          beginAtZero: true,
+          grid: {
+            drawOnChartArea: false, // Não desenha grid para evitar poluição
+            drawBorder: false
+          },
+          ticks: {
+            font: { size: 11 },
+            callback: function(value) {
+              return 'R$ ' + value.toFixed(0);
+            }
           }
         }
       }
-    }
+    },
+    plugins: [pluginZonasColoridas] // Registra o plugin customizado
   });
 }
 
