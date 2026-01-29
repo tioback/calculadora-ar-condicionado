@@ -1,12 +1,34 @@
-# Incluir algum tipo de cabeçalho
+# Chat Log: Desenvolvimento da Calculadora de Economia em Ar-Condicionado
 
-seguido de uma explicação do conteúdo do documento
+Registro completo da conversa com o Agente de IA [Grok](https://grok.com) (no modo `Auto`) sobre a fundamentação, metodologia de cálculo e implementação de uma ferramenta web para auxiliar consumidores a decidir o momento ideal de trocar um ar-condicionado antigo por um modelo mais eficiente, baseado em análise de consumo habitual, dados de etiquetas Inmetro e fatores de degradação/desempenho.
 
-## Prompt 1
+## Índice
+
+- [Troca 1](#troca-1)
+- [Troca 2](#troca-2)
+- [Troca 3](#troca-3)
+- [Troca 4](#troca-4)
+- [Troca 5](#troca-5)
+- [Troca 6](#troca-6)
+- [Troca 7](#troca-7)
+- [Troca 8](#troca-8)
+- [Troca 9](#troca-9)
+- [Troca 10](#troca-10)
+- [Troca 11](#troca-11)
+- [Troca 12](#troca-12)
+- [Troca 13](#troca-13)
+- [Troca 14](#troca-14)
+- [Troca 15](#troca-15)
+
+---
+
+### Troca 1
+
+#### Prompt 1 (Usuário)
 
 Considere que você é um engenheiro eletricista com pleno e profundo conhecimento no funcionamento de condicionadores de ar domésticos com as tecnologias mais recentes disponíveis no mercado.   Seu trabalho agora é ajudar um consumidor a avaliar quando um aparelho de ar condicionado mais antigo deve ser substituído por um mais novo com base no seu consumo habitual e na provável economia de energia que os modelos com tecnologias mais recentes tendem a proporcionar.   Seria possível realizar esta comparação apenas utilizando as informações de uso do consumidor e os dados das etiquetas do inmetro presentes em cada aparelho?
 
-## Resposta 1
+#### Resposta 1 (Grok)
 
 Sim, é perfeitamente possível fazer uma comparação razoável e útil entre o ar-condicionado antigo e um modelo novo usando apenas:
 
@@ -89,7 +111,11 @@ Se você fornecer os números exatos (consumo real, capacidade em BTU do antigo,
 
 ---
 
-## Prompt 2
+---
+
+### Troca 2
+
+#### Prompt 2 (Usuário)
 
 Vou esclarecer um ponto:   As informações de consumo às quais eu me referia não eram o consumo de fato do aparelho, pois é raro que se tenha um medidor exclusivo para os aparelhos de ar condicionado.   Ao invés disso, meu objetivo era um detalhamento do uso, como:
 
@@ -99,7 +125,7 @@ Vou esclarecer um ponto:   As informações de consumo às quais eu me referia 
 
 -   a variação da temperatura do ambiente externo é entre de z e w graus Celcius ao longo do dia
 
-## Resposta 2
+#### Resposta 2 (Grok)
 
 Sim, é possível fazer uma comparação útil e razoável usando apenas esses detalhes de uso (horas ligadas por dia, área total refrigerada e faixa de temperatura externa) combinados com as etiquetas Inmetro dos aparelhos antigo e novo.
 
@@ -181,11 +207,15 @@ Se você fornecer números concretos (ex: horas/dia, área m² total, faixa temp
 
 ---
 
-## Prompt 3
+---
+
+### Troca 3
+
+#### Prompt 3 (Usuário)
 
 O que precisaríamos para poder criar uma página que pudesse realizar tal cálculo? Quais tecnologias seriam necessárias? Bastaria HTML, CSS e JavaScript?
 
-## Resposta 3
+#### Resposta 3 (Grok)
 
 Sim, para criar uma página web funcional que faça exatamente esse cálculo de comparação de ar-condicionado (baseado em horas de uso, área refrigerada, faixa de temperatura externa e dados das etiquetas Inmetro), **basta HTML, CSS e JavaScript puro** (sem frameworks, sem backend, sem banco de dados).
 
@@ -268,7 +298,11 @@ Se quiser, posso descrever o código JS básico para os cálculos (ou até um es
 
 ---
 
-## Prompt 4
+---
+
+### Troca 4
+
+#### Prompt 4 (Usuário)
 
 Não há problema com a precisão não ser uma engenharia precisa, mas a aproximação necessária para auxiliar o consumidor na escolha do momento para trocar o aparelho. 
 
@@ -282,7 +316,7 @@ Ainda sobre a implementação, para os campos necessários para cada aparelho, q
 
 Inclua todas as extensões que sugeridas, inclusive GitHub Pages (que eu nunca usei antes).
 
-## Resposta 4
+#### Resposta 4 (Grok)
 
 Sim, as mudanças nas etiquetas Inmetro (de CEE + consumo mensal para IDRS + consumo anual sazonal) são um desafio comum, mas contornáveis com aproximações práticas que mantêm a utilidade para decisão de troca. O padrão atual (vigente desde ~2023, com atualizações em 2025) usa IDRS (Índice de Desempenho de Resfriamento Sazonal), consumo anual em kWh normalizado para 2080 horas/ano (equivalente a ~5,7 h/dia em média sazonal, considerando variações de temperatura e cargas parciais). Etiquetas antigas (até ~2024 em estoque) usam CEE e consumo mensal em teste full-load fixo (~35 °C externa, ~173 h/mês).
 
@@ -401,11 +435,15 @@ Se quiser, forneça preferências exatas de defaults ou campos, e descrevo/esbo�
 
 ---
 
-## Prompt 5
+---
+
+### Troca 5
+
+#### Prompt 5 (Usuário)
 
 Implemente a solução completa com base nos valores padrões que você sugeriu. Caso alguma informação específica esteja faltando, pergunte objetivamente. Disponibilize a solução num arquivo .zip contendo toda a estrutura do site para que eu possa incluir em meu repositório no GitHub.
 
-## Resposta 5
+#### Resposta 5 (Grok)
 
 Aqui está a implementação completa da calculadora de troca de ar-condicionado, baseada nas discussões anteriores. Usei os valores padrões que sugeri inicialmente, ajustados com dados reais observados em fontes recentes (2025-2026): consumo anual para inverter classe A em torno de 330-450 kWh/ano para 9k BTU, 450-600 para 12k, 700-900 para 18k (base 2080 h/ano, IDRS). Para classes inferiores ou on-off antigo, aumentei proporcionalmente (ex: on-off +40-60% vs inverter equivalente).
 
@@ -658,11 +696,15 @@ Teste localmente abrindo index.html no navegador. Se precisar de ajustes (ex: ma
 
 ---
 
-## Prompt 6
+---
+
+### Troca 6
+
+#### Prompt 6 (Usuário)
 
 A página ficou meio feia, coisa de amador.   Outra coisa, o gráfico não tem legenda da linha e da coluna. Coisa de amador, também.   Você além de tudo é um web developer e designer com extensa experiência em boas práticas de UX e desenvolvimento de sites.   Melhore o visual da página e das informações fornecidas para o usuário.
 
-## Resposta 6
+#### Resposta 6 (Grok)
 
 Aqui está a versão aprimorada da calculadora. Fiz melhorias sistemáticas no visual e na UX, mantendo tudo client-side (HTML + CSS + JS). O processo foi o seguinte:
 
@@ -939,7 +981,11 @@ document.getElementById('exportPdf').addEventListener('click', () => {
 
 ---
 
-## Prompt 7
+---
+
+### Troca 7
+
+#### Prompt 7 (Usuário)
 
 Vi que a fórmula do cálculo não considera o tempo de uso do aparelho. 
 
@@ -949,7 +995,7 @@ Fundamente sua resposta e, se a resposta for não, ajuste o formulário e os cá
 
 O layout atual também deve se ajustar conforme o tamanho da tela (ex.: computador x tablet x celular).
 
-## Resposta 7
+#### Resposta 7 (Grok)
 
 Não, um aparelho de ar-condicionado com 2 anos de uso não tem o mesmo desempenho que o mesmo modelo com 20 anos de uso.
 
@@ -1054,11 +1100,15 @@ Teste: Com idade 2 anos → fator ~1 (sem penalidade extra). Com 20 anos on-off 
 
 ---
 
-## Prompt 8
+---
+
+### Troca 8
+
+#### Prompt 8 (Usuário)
 
 Você mencionou mas não incluiu os fatores limpeza e manutenção do aparelho. Inclua os campos limpeza (em dia/pendente) e manutenção (em dia/pendente) e ajuste o cálculo.
 
-## Resposta 8
+#### Resposta 8 (Grok)
 
 Sim, os fatores de limpeza e manutenção precisam ser incluídos porque impactam diretamente o consumo real de forma mensurável e independente da idade/degradação natural.
 
@@ -1147,11 +1197,15 @@ Processo sistemático: Esses multiplicadores são conservadores e lineares para 
 
 ---
 
-## Prompt 9
+---
+
+### Troca 9
+
+#### Prompt 9 (Usuário)
 
 Evite enviar trechos para edição e forneça sempre os arquivos na íntegra, pois evita erros de interpretação e digitação.   Forneça novamente os arquivos index.html, style.css e script.js na íntegra.
 
-## Resposta 9
+#### Resposta 9 (Grok)
 
 Aqui está a versão completa e integrada da calculadora, com todos os ajustes acumulados até agora:
 
@@ -1486,7 +1540,11 @@ Esses arquivos são autônomos e devem rodar diretamente ao abrir index.html no 
 
 ---
 
-## Prompt 10
+---
+
+### Troca 10
+
+#### Prompt 10 (Usuário)
 
 Ótimo, assim está muito melhor.
 
@@ -1496,7 +1554,7 @@ A temperatura configurada no aparelho afeta o cálculo, pois configurar para 24 
 
 Se minha suspeita for confirmada, ajuste os formulários e os cálculos para refletir isso. (lembre-se de sempre fornecer arquivos na íntegra, caso haja modificações).
 
-## Resposta 10
+#### Resposta 10 (Grok)
 
 Sim, sua suspeita está correta.
 
@@ -1862,11 +1920,15 @@ Processo sistemático: O fator\_delta é linear em relação ao delta T (proporc
 
 ---
 
-## Prompt 11
+---
+
+### Troca 11
+
+#### Prompt 11 (Usuário)
 
 Um detalhe, estou armazenando os arquivos css e js em pastas específicas, então considere suas referências no index.html como sendo css/style.css e js/script.js. Outro detalhe, a legenda horizontal do gráfico deve ser alterada para: Horas de Uso/dia Forneça na íntegra apenas os arquivos que forem modificados, por favor.
 
-## Resposta 11
+#### Resposta 11 (Grok)
 
 Aqui está o ajuste solicitado.
 
@@ -2152,7 +2214,11 @@ Substitua apenas esses dois arquivos na sua estrutura de pastas (css/ e js/). O 
 
 ---
 
-## Prompt 12
+---
+
+### Troca 12
+
+#### Prompt 12 (Usuário)
 
 Uma dúvida, um dos aparelhos que usei para testar o script foi fabricado próximo a 2010. Na etiqueta do Inmetro consta:  
 
@@ -2162,7 +2228,7 @@ Além disso, há um campo "Eficiência Energética" com a legenda "A Plena Carga
 
 Esse tipo de etiqueta é contemplada nos tipos de cálculos que definimos?
 
-## Resposta 12
+#### Resposta 12 (Grok)
 
 Sim, esse tipo de etiqueta **é contemplado** nos cálculos que definimos, mas exige uma interpretação cuidadosa para não subestimar o consumo real.
 
@@ -2196,11 +2262,15 @@ Se quiser, forneça mais dados do seu teste (BTU exato, consumo real observado, 
 
 ---
 
-## Prompt 13
+---
+
+### Troca 13
+
+#### Prompt 13 (Usuário)
 
 O que seria necessário para reduzir a taxa de erros para 5%?
 
-## Resposta 13
+#### Resposta 13 (Grok)
 
 A taxa de erro atual na calculadora (estimada em ±15–30% no consumo real projetado) vem principalmente de aproximações lineares e defaults genéricos. Reduzir para ±5% é factível, mas exige passar de estimativa baseada em etiquetas Inmetro para validação empírica com medição real + refinamento de modelo.
 
@@ -2249,13 +2319,17 @@ Se fornecer os dados do seu teste (BTU, consumo real medido, etc.), posso simula
 
 ---
 
-## Prompt 14
+---
+
+### Troca 14
+
+#### Prompt 14 (Usuário)
 
 As instruções de prompt sobre sentir/experimentar devem ser usadas apenas para informações subjetivas, principalmente quando envolverem sensações fisiológicas em decorrência de medicações, doenças, alimentos, etc.
 
 Não há necessidade de fazer esse tipo de comentário o tempo todo, muito menos para dados objetivos.
 
-## Resposta 14
+#### Resposta 14 (Grok)
 
 Entendido, Renato.
 
@@ -2315,11 +2389,15 @@ Se após configurar o estilo não for seguido em algum chat, pode ser um bug tem
 
 ---
 
-## Prompt 15
+---
+
+### Troca 15
+
+#### Prompt 15 (Usuário)
 
 Não, eu não preciso que você me diga como incluir as regras, mas sim que me diga o que eu preciso modificar nas regras para que fique evidente para todos os chats a orientação que fiz acima sobre sentir/experimentar.
 
-## Resposta 15
+#### Resposta 15 (Grok)
 
 Para tornar a restrição sobre "o que você deve sentir/experimentar" explícita e aplicada em **todos os chats** (via Custom Instructions), você precisa adicionar uma instrução clara, imperativa e sem ambiguidades na seção "How would you like Grok to respond?".
 
