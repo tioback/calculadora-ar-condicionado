@@ -136,7 +136,10 @@ const elementos = {
   btnCalcular: document.getElementById('calcular'),
   btnExportarPdf: document.getElementById('exportPdf'),
   btnToggleTema: document.getElementById('toggleTheme'),
+  btnResetData: document.getElementById('resetData'),
   textoTema: document.getElementById('themeText'),
+  iconSun: document.getElementById('iconSun'),
+  iconMoon: document.getElementById('iconMoon'),
   
   // Saída
   output: document.getElementById('output'),
@@ -153,6 +156,16 @@ const elementos = {
 function alternarTema() {
   const isDark = document.body.classList.toggle('dark');
   elementos.textoTema.textContent = isDark ? 'Tema Claro' : 'Tema Escuro';
+  
+  // Alterna ícones
+  if (isDark) {
+    elementos.iconSun.classList.add('hidden');
+    elementos.iconMoon.classList.remove('hidden');
+  } else {
+    elementos.iconSun.classList.remove('hidden');
+    elementos.iconMoon.classList.add('hidden');
+  }
+  
   localStorage.setItem('darkMode', isDark);
 }
 
@@ -164,12 +177,43 @@ function carregarTema() {
   if (isDark) {
     document.body.classList.add('dark');
     elementos.textoTema.textContent = 'Tema Claro';
+    elementos.iconSun.classList.add('hidden');
+    elementos.iconMoon.classList.remove('hidden');
   }
 }
 
 // ============================================
 // PERSISTÊNCIA DE DADOS
 // ============================================
+
+/**
+ * Valores padrão do formulário
+ */
+const VALORES_PADRAO = {
+  horasDia: '8',
+  mesesAno: '6',
+  area: '15',
+  tempMin: '25',
+  tempMax: '35',
+  setpoint: '24',
+  precoKwh: '0.90',
+  tipoAntigo: 'onoff',
+  etiquetaAntigo: 'nova',
+  btuAntigo: '12000',
+  classeAntigo: '',
+  consumoAntigo: '',
+  unidadeAntigo: 'ano',
+  idadeAntigo: '10',
+  limpezaAntigo: 'emdia',
+  manutencaoAntigo: 'emdia',
+  tipoNovo: 'inverter',
+  etiquetaNovo: 'nova',
+  btuNovo: '12000',
+  classeNovo: 'A',
+  consumoNovo: '',
+  unidadeNovo: 'ano',
+  custoNovo: '5000'
+};
 
 /**
  * Lista de IDs dos campos do formulário
@@ -214,6 +258,51 @@ function carregarDadosFormulario() {
   } catch (erro) {
     console.error('Erro ao carregar dados salvos:', erro);
   }
+}
+
+/**
+ * Reseta todos os campos para os valores padrão
+ */
+function resetarDados() {
+  // Confirmação do usuário
+  const confirmacao = confirm(
+    'Tem certeza que deseja limpar todos os dados e voltar aos valores padrão?\n\n' +
+    'Esta ação não pode ser desfeita.'
+  );
+  
+  if (!confirmacao) return;
+  
+  // Reseta todos os campos
+  CAMPOS_FORMULARIO.forEach(campo => {
+    const elemento = document.getElementById(campo);
+    if (elemento && VALORES_PADRAO[campo] !== undefined) {
+      elemento.value = VALORES_PADRAO[campo];
+    }
+  });
+  
+  // Limpa resultados
+  elementos.output.innerHTML = '<p class="placeholder-text">Preencha os dados acima e clique em "Calcular Economia" para ver os resultados.</p>';
+  elementos.btnExportarPdf.disabled = true;
+  
+  // Destrói gráfico se existir
+  if (graficoAtual) {
+    graficoAtual.destroy();
+    graficoAtual = null;
+  }
+  
+  // Remove dados salvos
+  localStorage.removeItem('calcData');
+  
+  // Feedback visual
+  const btnTexto = elementos.btnResetData.querySelector('.btn-text');
+  const textoOriginal = btnTexto.textContent;
+  btnTexto.textContent = 'Limpo!';
+  
+  setTimeout(() => {
+    btnTexto.textContent = textoOriginal;
+  }, 2000);
+  
+  console.info('✅ Dados resetados para valores padrão');
 }
 
 // ============================================
@@ -680,6 +769,7 @@ function inicializar() {
   elementos.btnCalcular.addEventListener('click', calcularEconomia);
   elementos.btnExportarPdf.addEventListener('click', exportarParaPDF);
   elementos.btnToggleTema.addEventListener('click', alternarTema);
+  elementos.btnResetData.addEventListener('click', resetarDados);
   
   // Auto-salvar dados ao alterar campos
   CAMPOS_FORMULARIO.forEach(campo => {
