@@ -55,6 +55,8 @@ A calculadora usa valores de consumo baseados no padrão Inmetro para diferentes
 
 *Valores para tecnologia inverter em condições padrão (35°C externa, 27°C interna, 2080h/ano)*
 
+> ⚠️ **Nota sobre Precisão**: As estimativas de consumo energético estão sujeitas a uma variação de ±15 a 30% em relação ao consumo real, devido a aproximações nos modelos de cálculo e variações nas condições reais de uso.
+
 ## ✨ Funcionalidades
 
 - ✅ Cálculo detalhado de economia energética e financeira

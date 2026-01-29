@@ -188,12 +188,12 @@ export function desenharRodape(doc, numeroPagina, totalPaginas) {
  */
 export function extrairValoresOutput(outputText) {
   return {
-    fatorHoras: outputText.match(/Fator de horas de uso:\s*([\d,\.]+)x/)?.[1],
-    deltaTReal: outputText.match(/Delta T real:\s*([\d,\.]+)°C/)?.[1],
-    fatorDeltaT: outputText.match(/Fator delta T:\s*([\d,\.]+)x/)?.[1],
+    fatorHoras: outputText.match(/Fator de horas de uso:\s*([\d,\.]+)x\s*\(([^)]+)\)/),
+    deltaTReal: outputText.match(/Delta T real:\s*([\d,\.]+)°C\s*\(([^)]+)\)/),
+    fatorDeltaT: outputText.match(/Fator delta T:\s*([\d,\.]+)x\s*\(([^)]+)\)/),
     fatorTemp: outputText.match(/Fator temperatura externa:\s*([\d,\.]+)x/)?.[1],
-    fatorDegradacao: outputText.match(/Fator degradação \(idade\):\s*([\d,\.]+)x/)?.[1],
-    fatorManutencao: outputText.match(/Fator manutenção:\s*([\d,\.]+)x/)?.[1],
+    fatorDegradacao: outputText.match(/Fator degradação \(idade\):\s*([\d,\.]+)x\s*\(([^)]+)\)/),
+    fatorManutencao: outputText.match(/Fator manutenção:\s*([\d,\.]+)x\s*\(([^)]+)\)/),
     consumoAntigo: outputText.match(/Aparelho atual \(antigo\):\s*([\d\.]+) kWh\/ano/)?.[1],
     consumoNovo: outputText.match(/Aparelho novo:\s*([\d\.]+) kWh\/ano/)?.[1],
     economia: outputText.match(/Economia anual:\s*([\d\.,]+)\s*kWh\s*\(R\$\s*([\d\.,]+)\)/),

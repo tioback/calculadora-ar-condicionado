@@ -98,12 +98,27 @@ export function exportarParaPDF(graficoAtual) {
     yManager.advance(6);
     
     const fatores = [];
-    if (valores.fatorHoras) fatores.push(`Fator de horas: ${valores.fatorHoras}x`);
-    if (valores.deltaTReal) fatores.push(`Delta T real: ${valores.deltaTReal} °C`);
-    if (valores.fatorDeltaT) fatores.push(`Fator delta T: ${valores.fatorDeltaT}x`);
+    if (valores.fatorHoras) {
+      const info = valores.fatorHoras[2] || '';
+      fatores.push(`Fator de horas: ${valores.fatorHoras[1]}x (${info})`);
+    }
+    if (valores.deltaTReal) {
+      const info = valores.deltaTReal[2] || '';
+      fatores.push(`Delta T real: ${valores.deltaTReal[1]} °C (${info})`);
+    }
+    if (valores.fatorDeltaT) {
+      const info = valores.fatorDeltaT[2] || '';
+      fatores.push(`Fator delta T: ${valores.fatorDeltaT[1]}x (${info})`);
+    }
     if (valores.fatorTemp) fatores.push(`Fator temperatura: ${valores.fatorTemp}x`);
-    if (valores.fatorDegradacao) fatores.push(`Fator degradação: ${valores.fatorDegradacao}x`);
-    if (valores.fatorManutencao) fatores.push(`Fator manutenção: ${valores.fatorManutencao}x`);
+    if (valores.fatorDegradacao) {
+      const info = valores.fatorDegradacao[2] || '';
+      fatores.push(`Fator degradacao: ${valores.fatorDegradacao[1]}x (${info})`);
+    }
+    if (valores.fatorManutencao) {
+      const info = valores.fatorManutencao[2] || '';
+      fatores.push(`Fator manutencao: ${valores.fatorManutencao[1]}x (${info})`);
+    }
     
     yManager.set(desenharFatoresAjuste(doc, fatores, yManager.current));
     
@@ -196,6 +211,15 @@ export function exportarParaPDF(graficoAtual) {
     doc.setTextColor(...corRec);
     const linhasRec = doc.splitTextToSize(recomendacao, LAYOUT.marginWidth - 4);
     doc.text(linhasRec, LAYOUT.marginLeft + 2, yManager.current);
+    yManager.advance(linhasRec.length * 3 + 4);
+    
+    // === Disclaimer ===
+    doc.setFontSize(FONTS.tiny);
+    doc.setFont('helvetica', 'italic');
+    doc.setTextColor(...COLORS.textLight);
+    const disclaimer = 'Nota: Estimativas sujeitas a variação de +/-15 a 30% devido a aproximações e condições reais de uso.';
+    const linhasDisclaimer = doc.splitTextToSize(disclaimer, LAYOUT.marginWidth - 4);
+    doc.text(linhasDisclaimer, LAYOUT.marginLeft + 2, yManager.current);
     
     // ===== RODAPÉ PÁGINA 1 =====
     desenharRodape(doc, 1, 2);

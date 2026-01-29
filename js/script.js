@@ -502,6 +502,11 @@ function gerarMensagemResultados(resultados) {
     html += '</div>';
   }
   
+  // Disclaimer
+  html += '\n<div class="disclaimer">';
+  html += '<p><em>⚠️ Nota: As estimativas de consumo estão sujeitas a variação de ±15 a 30% em relação ao consumo real, devido a aproximações de cálculo e condições específicas de uso.</em></p>';
+  html += '</div>';
+  
   html += '</div>';
   
   return html;
@@ -1263,6 +1268,15 @@ function exportarParaPDF() {
     doc.setTextColor(...corRecomendacao);
     const linhasRec = doc.splitTextToSize(recomendacao, larguraUtil - 4);
     doc.text(linhasRec, margemEsq + 2, yPos);
+    yPos += linhasRec.length * 3 + 4;
+    
+    // === Disclaimer ===
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'italic');
+    doc.setTextColor(...corTextoClaro);
+    const disclaimer = 'Nota: Estimativas sujeitas a variação de +/-15 a 30% devido a aproximações e condições reais de uso.';
+    const linhasDisclaimer = doc.splitTextToSize(disclaimer, larguraUtil - 4);
+    doc.text(linhasDisclaimer, margemEsq + 2, yPos);
     
     // ===== RODAPÉ PÁGINA 1 =====
     doc.setDrawColor(200, 200, 200);

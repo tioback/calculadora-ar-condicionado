@@ -111,6 +111,11 @@ function gerarMensagemResultados(resultados) {
     html += '</div>';
   }
   
+  // Disclaimer
+  html += '\n<div class="disclaimer">';
+  html += '<p><em>⚠️ Nota: As estimativas de consumo estão sujeitas a variação de ±15 a 30% em relação ao consumo real, devido a aproximações de cálculo e condições específicas de uso.</em></p>';
+  html += '</div>';
+  
   html += '</div>';
   return html;
 }

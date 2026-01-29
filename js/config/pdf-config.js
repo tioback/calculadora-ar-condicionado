@@ -52,7 +52,7 @@ export const PDF_CONFIG = {
     betweenItems: 6,
     betweenSubItems: 4,
     columnItemHeight: 4.5,
-    resultBoxHeight: 100
+    resultBoxHeight: 108
   },
 
   // Página 2 (landscape)
