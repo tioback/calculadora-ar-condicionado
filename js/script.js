@@ -27,8 +27,13 @@ function calcular() {
   const mesesAno = parseFloat(document.getElementById('mesesAno').value) || 6;
   const horasAno = horasDia * 30 * mesesAno;
   const fatorHoras = horasAno / 2080;
+
   const tempMedia = (parseFloat(document.getElementById('tempMin').value) + parseFloat(document.getElementById('tempMax').value)) / 2 || 32;
-  const fatorTemp = Math.max(0.5, 1 - 0.015 * (35 - tempMedia));
+  const setpoint = parseFloat(document.getElementById('setpoint').value) || 24;
+  const deltaReal = tempMedia - setpoint;
+  const deltaPadrao = 8; // 35 - 27
+  const fatorDelta = deltaReal > 0 ? deltaReal / deltaPadrao : 0.5; // mínimo 0.5 se externa mais fria
+  const fatorTemp = Math.max(0.5, 1 - 0.015 * (35 - tempMedia)); // fator temp externo mantido
 
   const precoKwh = parseFloat(document.getElementById('precoKwh').value) || 0.90;
   const custoNovo = parseFloat(document.getElementById('custoNovo').value) || 5000;
@@ -56,7 +61,7 @@ function calcular() {
       fatorExtra = fLimpeza * fManutencao;
     }
 
-    return anual * fatorHoras * fatorTemp * fatorDegradacao * fatorExtra;
+    return anual * fatorHoras * fatorTemp * fatorDegradacao * fatorExtra * fatorDelta;
   }
 
   const consumoAntigo = getConsumoReal('Antigo');
@@ -67,7 +72,9 @@ function calcular() {
   const payback = economiaReais > 0 ? custoNovo / economiaReais : Infinity;
 
   let msg = `Fator horas: ${fatorHoras.toFixed(2)} (uso ${fatorHoras > 1 ? 'mais intenso' : 'menos intenso'} que padrão Inmetro)\n`;
-  msg += `Fator temperatura: ${fatorTemp.toFixed(2)}\n`;
+  msg += `Delta T real: ${deltaReal.toFixed(1)} °C (externa média ${tempMedia.toFixed(1)} °C - setpoint ${setpoint} °C)\n`;
+  msg += `Fator delta T: ${fatorDelta.toFixed(2)} (vs padrão Inmetro ~8 °C)\n`;
+  msg += `Fator temperatura externa: ${fatorTemp.toFixed(2)}\n`;
 
   // Fatores do antigo
   const idadeAntigo = parseFloat(document.getElementById('idadeAntigo').value) || 10;
@@ -98,12 +105,12 @@ function calcular() {
 
   output.innerHTML = msg;
 
-  // Gráfico
+  // Gráfico (ajustado para considerar fatorDelta no eco, mas como afeta ambos, payback relativo muda pouco)
   const ctx = document.getElementById('graficoPayback').getContext('2d');
   const labels = Array.from({length: 9}, (_, i) => 4 + i);
   const data = labels.map(h => {
-    const hAno = h * 30 * mesesAno / 2080 * fatorTemp;
-    const eco = (consumoAntigo / fatorHoras / fatorTemp - consumoNovo / fatorHoras / fatorTemp) * hAno * precoKwh;
+    const hAno = h * 30 * mesesAno / 2080 * fatorTemp * fatorDelta;
+    const eco = (consumoAntigo / (fatorHoras * fatorTemp * fatorDelta) - consumoNovo / (fatorHoras * fatorTemp * fatorDelta)) * hAno * precoKwh;
     return eco > 0 ? custoNovo / eco : 50;
   });
 
@@ -117,10 +124,10 @@ function calcular() {
       responsive: true,
       plugins: {
         legend: { display: true, position: 'top' },
-        title: { display: true, text: 'Sensibilidade: Payback vs Horas de Uso Diário' }
+        title: { display: true, text: 'Sensibilidade: Payback vs Horas de Uso Diário (com delta T atual)' }
       },
       scales: {
-        x: { title: { display: true, text: 'Horas/dia' } },
+        x: { title: { display: true, text: 'Horas de Uso/dia' } },
         y: { title: { display: true, text: 'Anos para retorno' }, beginAtZero: true }
       }
     }
@@ -130,6 +137,7 @@ function calcular() {
   localStorage.setItem('calcData', JSON.stringify({
     horasDia, mesesAno, area: document.getElementById('area').value,
     tempMin: document.getElementById('tempMin').value, tempMax: document.getElementById('tempMax').value,
+    setpoint: document.getElementById('setpoint').value,
     precoKwh, custoNovo,
     tipoAntigo: document.getElementById('tipoAntigo').value,
     etiquetaAntigo: document.getElementById('etiquetaAntigo').value,
@@ -151,6 +159,7 @@ window.onload = () => {
     document.getElementById('area').value = saved.area || 15;
     document.getElementById('tempMin').value = saved.tempMin || 25;
     document.getElementById('tempMax').value = saved.tempMax || 35;
+    document.getElementById('setpoint').value = saved.setpoint || 24;
     document.getElementById('precoKwh').value = saved.precoKwh || 0.90;
     document.getElementById('custoNovo').value = saved.custoNovo || 5000;
     document.getElementById('tipoAntigo').value = saved.tipoAntigo || 'onoff';
