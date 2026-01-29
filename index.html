@@ -3,67 +3,333 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Calculadora de Troca de Ar-Condicionado</title>
+  <meta name="description" content="Calcule a economia ao trocar seu ar-condicionado antigo por um modelo mais eficiente. Análise detalhada de payback e custos.">
+  <meta name="keywords" content="ar-condicionado, calculadora, economia, energia, BTU, inverter, payback">
+  <meta name="author" content="Calculadora de Ar-Condicionado">
+  <meta name="theme-color" content="#0056b3">
+  
+  <title>Calculadora de Economia na Troca de Ar-Condicionado | Análise de Payback</title>
+  
+  <!-- Styles -->
   <link rel="stylesheet" href="css/style.css">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  
+  <!-- External Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
 </head>
 <body>
   <header>
     <h1>Calculadora de Economia na Troca de Ar-Condicionado</h1>
-    <button id="toggleTheme">Tema Escuro</button>
+    <button 
+      id="toggleTheme" 
+      aria-label="Alternar tema escuro/claro"
+      title="Alternar entre tema claro e escuro">
+      <span id="themeText">Tema Escuro</span>
+    </button>
   </header>
 
   <main class="grid">
-    <fieldset>
-      <legend>Dados de Uso</legend>
-      <label>Horas/dia <input type="number" id="horasDia" value="8" min="1" step="0.5" required placeholder="Ex: 8"></label>
-      <label>Meses/ano <input type="number" id="mesesAno" value="6" min="1" max="12" required placeholder="Ex: 6 (verão)"></label>
-      <label>Área (m²) <input type="number" id="area" value="15" required placeholder="Área total refrigerada"></label>
-      <label>Temp externa min (°C) <input type="number" id="tempMin" value="25" required placeholder="Ex: 25 à noite"></label>
-      <label>Temp externa max (°C) <input type="number" id="tempMax" value="35" required placeholder="Ex: 35 ao meio-dia"></label>
-      <label>Setpoint interna (°C) <input type="number" id="setpoint" value="24" min="16" max="30" step="0.5" required placeholder="Temperatura configurada no controle"></label>
-      <label>Preço kWh (R$) <input type="number" id="precoKwh" value="0.90" step="0.01" required placeholder="Verifique na conta"></label>
+    <!-- Seção: Parâmetros de uso e ambiente -->
+    <fieldset aria-labelledby="legend-uso">
+      <legend id="legend-uso">Dados de Uso</legend>
+      <label for="horasDia">
+        Horas de uso por dia
+        <input 
+          type="number" 
+          id="horasDia" 
+          name="horasDia"
+          value="8" 
+          min="1" 
+          step="0.5" 
+          required 
+          placeholder="Ex: 8"
+          aria-describedby="hint-horas">
+        <small id="hint-horas" class="hint">Quantas horas por dia o ar-condicionado fica ligado</small>
+      </label>
+      <label for="mesesAno">
+        Meses de uso por ano
+        <input 
+          type="number" 
+          id="mesesAno" 
+          name="mesesAno"
+          value="6" 
+          min="1" 
+          max="12" 
+          required 
+          placeholder="Ex: 6"
+          aria-describedby="hint-meses">
+        <small id="hint-meses" class="hint">Típico: 6 meses no verão</small>
+      </label>
+      <label for="area">
+        Área do ambiente (m²)
+        <input 
+          type="number" 
+          id="area" 
+          name="area"
+          value="15" 
+          min="1"
+          required 
+          placeholder="Ex: 15"
+          aria-describedby="hint-area">
+        <small id="hint-area" class="hint">Área total a ser refrigerada</small>
+      </label>
+      <label for="tempMin">
+        Temperatura externa mínima (°C)
+        <input 
+          type="number" 
+          id="tempMin" 
+          name="tempMin"
+          value="25" 
+          min="15"
+          max="40"
+          required 
+          placeholder="Ex: 25">
+        <small class="hint">Temperatura mais baixa (geralmente à noite)</small>
+      </label>
+      <label for="tempMax">
+        Temperatura externa máxima (°C)
+        <input 
+          type="number" 
+          id="tempMax" 
+          name="tempMax"
+          value="35" 
+          min="20"
+          max="50"
+          required 
+          placeholder="Ex: 35">
+        <small class="hint">Temperatura mais alta (geralmente ao meio-dia)</small>
+      </label>
+      <label for="setpoint">
+        Temperatura desejada - Setpoint (°C)
+        <input 
+          type="number" 
+          id="setpoint" 
+          name="setpoint"
+          value="24" 
+          min="16" 
+          max="30" 
+          step="0.5" 
+          required 
+          placeholder="Ex: 24">
+        <small class="hint">Temperatura configurada no controle remoto</small>
+      </label>
+      <label for="precoKwh">
+        Preço do kWh (R$)
+        <input 
+          type="number" 
+          id="precoKwh" 
+          name="precoKwh"
+          value="0.90" 
+          min="0.01"
+          step="0.01" 
+          required 
+          placeholder="Ex: 0.90"
+          aria-describedby="hint-preco">
+        <small id="hint-preco" class="hint">Verifique o valor na sua conta de energia</small>
+      </label>
     </fieldset>
 
-    <fieldset>
-      <legend>Aparelho Antigo</legend>
-      <label>Tipo <select id="tipoAntigo"><option value="onoff">On-off (antigo)</option><option value="inverter">Inverter</option></select></label>
-      <label>Etiqueta <select id="etiquetaAntigo"><option value="nova">Nova (kWh/ano)</option><option value="antiga">Antiga (kWh/mês)</option></select></label>
-      <label>BTU/h <input type="number" id="btuAntigo" value="12000" required placeholder="Ex: 12000"></label>
-      <label>Classe <select id="classeAntigo"><option value="">Não sei</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option><option value="F">F</option></select></label>
-      <label>Consumo (opcional) <input type="number" id="consumoAntigo" placeholder="Deixe vazio para default"> <select id="unidadeAntigo"><option value="ano">kWh/ano</option><option value="mes">kWh/mês</option></select></label>
-      <label>Idade (anos) <input type="number" id="idadeAntigo" value="10" min="0" required placeholder="Ex: 10 anos de uso"></label>
-      <label>Limpeza <select id="limpezaAntigo"><option value="emdia" selected>Em dia</option><option value="pendente">Pendente</option></select></label>
-      <label>Manutenção <select id="manutencaoAntigo"><option value="emdia" selected>Em dia</option><option value="pendente">Pendente</option></select></label>
+    <!-- Seção: Especificações do aparelho atual (antigo) -->
+    <fieldset aria-labelledby="legend-antigo">
+      <legend id="legend-antigo">Aparelho Atual (Antigo)</legend>
+      <label for="tipoAntigo">
+        Tipo de tecnologia
+        <select id="tipoAntigo" name="tipoAntigo">
+          <option value="onoff">On-Off (tecnologia antiga)</option>
+          <option value="inverter">Inverter</option>
+        </select>
+      </label>
+      <label for="etiquetaAntigo">
+        Tipo de etiqueta
+        <select id="etiquetaAntigo" name="etiquetaAntigo">
+          <option value="nova">Nova (kWh/ano)</option>
+          <option value="antiga">Antiga (kWh/mês)</option>
+        </select>
+      </label>
+      <label for="btuAntigo">
+        Capacidade (BTU/h)
+        <input 
+          type="number" 
+          id="btuAntigo" 
+          name="btuAntigo"
+          value="12000" 
+          min="7000"
+          step="1000"
+          required 
+          placeholder="Ex: 12000">
+        <small class="hint">Geralmente 9000, 12000, 18000 ou 24000 BTU/h</small>
+      </label>
+      <label for="classeAntigo">
+        Classe de eficiência energética
+        <select id="classeAntigo" name="classeAntigo">
+          <option value="">Não sei / Não informado</option>
+          <option value="A">A (mais eficiente)</option>
+          <option value="B">B</option>
+          <option value="C">C</option>
+          <option value="D">D</option>
+          <option value="E">E</option>
+          <option value="F">F (menos eficiente)</option>
+        </select>
+      </label>
+      <label for="consumoAntigo">
+        Consumo informado (opcional)
+        <div class="input-group">
+          <input 
+            type="number" 
+            id="consumoAntigo" 
+            name="consumoAntigo"
+            placeholder="Deixe vazio para usar valor padrão"
+            min="0"
+            step="10">
+          <select id="unidadeAntigo" name="unidadeAntigo" aria-label="Unidade de consumo">
+            <option value="ano">kWh/ano</option>
+            <option value="mes">kWh/mês</option>
+          </select>
+        </div>
+        <small class="hint">Se souber o consumo da etiqueta, informe aqui</small>
+      </label>
+      <label for="idadeAntigo">
+        Idade do aparelho (anos)
+        <input 
+          type="number" 
+          id="idadeAntigo" 
+          name="idadeAntigo"
+          value="10" 
+          min="0" 
+          max="30"
+          required 
+          placeholder="Ex: 10">
+        <small class="hint">Afeta eficiência por degradação dos componentes</small>
+      </label>
+      <label for="limpezaAntigo">
+        Estado de limpeza
+        <select id="limpezaAntigo" name="limpezaAntigo">
+          <option value="emdia" selected>Em dia (limpo)</option>
+          <option value="pendente">Pendente (sujo)</option>
+        </select>
+        <small class="hint">Filtros e serpentinas sujos aumentam consumo em ~15%</small>
+      </label>
+      <label for="manutencaoAntigo">
+        Estado de manutenção
+        <select id="manutencaoAntigo" name="manutencaoAntigo">
+          <option value="emdia" selected>Em dia</option>
+          <option value="pendente">Pendente</option>
+        </select>
+        <small class="hint">Manutenção pendente aumenta consumo em ~10%</small>
+      </label>
     </fieldset>
 
-    <fieldset>
-      <legend>Aparelho Novo</legend>
-      <label>Tipo <select id="tipoNovo"><option value="inverter">Inverter</option><option value="onoff">On-off</option></select></label>
-      <label>Etiqueta <select id="etiquetaNovo"><option value="nova">Nova (kWh/ano)</option><option value="antiga">Antiga (kWh/mês)</option></select></label>
-      <label>BTU/h <input type="number" id="btuNovo" value="12000" required placeholder="Ex: 12000"></label>
-      <label>Classe <select id="classeNovo"><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="">Não sei</option></select></label>
-      <label>Consumo (opcional) <input type="number" id="consumoNovo" placeholder="Deixe vazio para default"> <select id="unidadeNovo"><option value="ano">kWh/ano</option><option value="mes">kWh/mês</option></select></label>
-      <label>Custo novo (R$) <input type="number" id="custoNovo" value="5000" required placeholder="Preço estimado"></label>
+    <!-- Seção: Especificações do aparelho novo a ser comprado -->
+    <fieldset aria-labelledby="legend-novo">
+      <legend id="legend-novo">Aparelho Novo (a comprar)</legend>
+      <label for="tipoNovo">
+        Tipo de tecnologia
+        <select id="tipoNovo" name="tipoNovo">
+          <option value="inverter">Inverter (recomendado)</option>
+          <option value="onoff">On-Off</option>
+        </select>
+      </label>
+      <label for="etiquetaNovo">
+        Tipo de etiqueta
+        <select id="etiquetaNovo" name="etiquetaNovo">
+          <option value="nova">Nova (kWh/ano)</option>
+          <option value="antiga">Antiga (kWh/mês)</option>
+        </select>
+      </label>
+      <label for="btuNovo">
+        Capacidade (BTU/h)
+        <input 
+          type="number" 
+          id="btuNovo" 
+          name="btuNovo"
+          value="12000" 
+          min="7000"
+          step="1000"
+          required 
+          placeholder="Ex: 12000">
+        <small class="hint">Escolha capacidade adequada à área do ambiente</small>
+      </label>
+      <label for="classeNovo">
+        Classe de eficiência energética
+        <select id="classeNovo" name="classeNovo">
+          <option value="A">A (mais eficiente - recomendado)</option>
+          <option value="B">B</option>
+          <option value="C">C</option>
+          <option value="">Não sei / Não informado</option>
+        </select>
+      </label>
+      <label for="consumoNovo">
+        Consumo informado (opcional)
+        <div class="input-group">
+          <input 
+            type="number" 
+            id="consumoNovo" 
+            name="consumoNovo"
+            placeholder="Deixe vazio para usar valor padrão"
+            min="0"
+            step="10">
+          <select id="unidadeNovo" name="unidadeNovo" aria-label="Unidade de consumo">
+            <option value="ano">kWh/ano</option>
+            <option value="mes">kWh/mês</option>
+          </select>
+        </div>
+        <small class="hint">Consulte o consumo na etiqueta do aparelho</small>
+      </label>
+      <label for="custoNovo">
+        Custo do aparelho novo (R$)
+        <input 
+          type="number" 
+          id="custoNovo" 
+          name="custoNovo"
+          value="5000" 
+          min="500"
+          step="100"
+          required 
+          placeholder="Ex: 5000">
+        <small class="hint">Preço de compra incluindo instalação</small>
+      </label>
     </fieldset>
 
+    <!-- Ações -->
     <div class="actions">
-      <button id="calcular">Calcular Economia</button>
-      <button id="exportPdf">Exportar PDF</button>
+      <button 
+        id="calcular" 
+        type="button"
+        class="btn-primary"
+        aria-label="Calcular economia e gerar resultados">
+        <span class="btn-text">Calcular Economia</span>
+      </button>
+      <button 
+        id="exportPdf" 
+        type="button"
+        class="btn-secondary"
+        aria-label="Exportar resultados em PDF"
+        disabled>
+        <span class="btn-text">Exportar PDF</span>
+      </button>
     </div>
 
-    <section id="resultados" class="card">
-      <h2>Resultados</h2>
-      <div id="output"></div>
+    <!-- Seção de Resultados -->
+    <section id="resultados" class="card" aria-labelledby="titulo-resultados">
+      <h2 id="titulo-resultados">Resultados da Análise</h2>
+      <div id="output" role="region" aria-live="polite">
+        <p class="placeholder-text">Preencha os dados acima e clique em "Calcular Economia" para ver os resultados.</p>
+      </div>
     </section>
 
-    <section class="card">
-      <h2>Gráfico: Payback vs Horas/dia</h2>
-      <canvas id="graficoPayback"></canvas>
+    <!-- Seção de Gráfico -->
+    <section class="card" aria-labelledby="titulo-grafico">
+      <h2 id="titulo-grafico">Análise de Sensibilidade</h2>
+      <p class="chart-description">Impacto das horas diárias de uso no tempo de retorno do investimento</p>
+      <canvas 
+        id="graficoPayback" 
+        role="img" 
+        aria-label="Gráfico de linha mostrando o payback em anos versus horas de uso por dia">
+      </canvas>
     </section>
   </main>
 
-  <script src="js/script.js"></script>
+  <!-- Script principal -->
+  <script src="js/script.js" defer></script>
 </body>
 </html>
