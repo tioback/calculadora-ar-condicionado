@@ -937,21 +937,41 @@ function gerarGraficoSensibilidade(resultados) {
 // ============================================
 
 /**
- * Exporta os resultados para PDF
+ * Exporta os resultados para PDF com formatação profissional
+ * Replica a visualização do navegador com todas as seções
  */
 function exportarParaPDF() {
   try {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
     
-    // Título
-    doc.setFontSize(18);
-    doc.setFont(undefined, 'bold');
-    doc.text('Relatório: Economia na Troca de Ar-Condicionado', 20, 20);
+    // Cores
+    const corPrimaria = [0, 86, 179];
+    const corSucesso = [40, 167, 69];
+    const corAviso = [255, 193, 7];
+    const corPerigo = [220, 53, 69];
+    const corTexto = [33, 37, 41];
+    const corTextoClaro = [108, 117, 125];
     
-    // Data do relatório
-    doc.setFontSize(10);
-    doc.setFont(undefined, 'normal');
+    let yPos = 20;
+    const margemEsq = 20;
+    const margemDir = 190;
+    const larguraUtil = margemDir - margemEsq;
+    
+    // ===== CABEÇALHO =====
+    doc.setFillColor(...corPrimaria);
+    doc.rect(0, 0, 210, 35, 'F');
+    
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(20);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Relatório de Análise', margemEsq, 15);
+    doc.setFontSize(16);
+    doc.text('Economia na Troca de Ar-Condicionado', margemEsq, 23);
+    
+    // Data e hora
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'normal');
     const dataAtual = new Date().toLocaleDateString('pt-BR', {
       day: '2-digit',
       month: '2-digit',
@@ -959,36 +979,357 @@ function exportarParaPDF() {
       hour: '2-digit',
       minute: '2-digit'
     });
-    doc.text(`Gerado em: ${dataAtual}`, 20, 28);
+    doc.text(`Gerado em: ${dataAtual}`, margemEsq, 30);
     
-    // Conteúdo
+    yPos = 45;
+    doc.setTextColor(...corTexto);
+    
+    // ===== DADOS DE ENTRADA =====
+    doc.setFontSize(14);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(...corPrimaria);
+    doc.text('Parâmetros de Uso', margemEsq, yPos);
+    yPos += 5;
+    
+    doc.setDrawColor(...corPrimaria);
+    doc.setLineWidth(0.5);
+    doc.line(margemEsq, yPos, margemDir, yPos);
+    yPos += 8;
+    
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(...corTexto);
+    
+    const dados = [
+      ['Horas de uso por dia:', document.getElementById('horasDia').value + ' h'],
+      ['Meses de uso por ano:', document.getElementById('mesesAno').value + ' meses'],
+      ['Área do ambiente:', document.getElementById('area').value + ' m²'],
+      ['Temperatura externa média:', 
+        `${((parseFloat(document.getElementById('tempMin').value) + parseFloat(document.getElementById('tempMax').value)) / 2).toFixed(1)} °C`],
+      ['Temperatura desejada:', document.getElementById('setpoint').value + ' °C'],
+      ['Preço da energia:', 'R$ ' + parseFloat(document.getElementById('precoKwh').value).toFixed(2) + '/kWh']
+    ];
+    
+    dados.forEach(([label, valor]) => {
+      doc.setFont('helvetica', 'bold');
+      doc.text(label, margemEsq, yPos);
+      doc.setFont('helvetica', 'normal');
+      doc.text(valor, margemEsq + 70, yPos);
+      yPos += 6;
+    });
+    
+    yPos += 4;
+    
+    // ===== APARELHOS EM DUAS COLUNAS =====
+    doc.setFontSize(14);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(...corPrimaria);
+    doc.text('Aparelhos Comparados', margemEsq, yPos);
+    yPos += 5;
+    
+    doc.setDrawColor(...corPrimaria);
+    doc.line(margemEsq, yPos, margemDir, yPos);
+    yPos += 3;
+    
+    const yPosInicial = yPos;
+    const larguraColuna = (larguraUtil - 4) / 2;
+    const coluna1X = margemEsq;
+    const coluna2X = margemEsq + larguraColuna + 4;
+    
+    // COLUNA 1: Aparelho Antigo
+    yPos = yPosInicial + 5;
     doc.setFontSize(11);
-    const textoResultados = elementos.output.textContent;
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(...corTexto);
+    doc.text('Aparelho Atual (Antigo)', coluna1X, yPos);
+    yPos += 6;
     
-    // Quebra o texto em linhas para caber na página
-    const linhas = doc.splitTextToSize(textoResultados, 170);
-    doc.text(linhas, 20, 40);
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'normal');
+    const dadosAntigo = [
+      ['Tipo:', document.getElementById('tipoAntigo').value === 'onoff' ? 'On-Off' : 'Inverter'],
+      ['Capacidade:', document.getElementById('btuAntigo').value + ' BTU/h'],
+      ['Classe energética:', document.getElementById('classeAntigo').value || 'Não informado'],
+      ['Idade:', document.getElementById('idadeAntigo').value + ' anos'],
+      ['Limpeza:', document.getElementById('limpezaAntigo').value === 'emdia' ? 'Em dia' : 'Pendente'],
+      ['Manutenção:', document.getElementById('manutencaoAntigo').value === 'emdia' ? 'Em dia' : 'Pendente']
+    ];
     
-    // Rodapé
-    const totalPaginas = doc.internal.getNumberOfPages();
-    for (let i = 1; i <= totalPaginas; i++) {
-      doc.setPage(i);
-      doc.setFontSize(8);
-      doc.setTextColor(128);
-      doc.text(
-        'Calculadora de Economia em Ar-Condicionado',
-        doc.internal.pageSize.getWidth() / 2,
-        doc.internal.pageSize.getHeight() - 10,
-        { align: 'center' }
-      );
+    dadosAntigo.forEach(([label, valor]) => {
+      const linha = `${label} ${valor}`;
+      const linhasQuebradas = doc.splitTextToSize(linha, larguraColuna - 4);
+      doc.text(linhasQuebradas, coluna1X + 2, yPos);
+      yPos += 4.5;
+    });
+    
+    // COLUNA 2: Aparelho Novo
+    yPos = yPosInicial + 5;
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Aparelho Novo (a comprar)', coluna2X, yPos);
+    yPos += 6;
+    
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'normal');
+    const dadosNovo = [
+      ['Tipo:', document.getElementById('tipoNovo').value === 'onoff' ? 'On-Off' : 'Inverter'],
+      ['Capacidade:', document.getElementById('btuNovo').value + ' BTU/h'],
+      ['Classe energética:', document.getElementById('classeNovo').value || 'Não informado'],
+      ['Custo:', 'R$ ' + parseFloat(document.getElementById('custoNovo').value).toFixed(2)]
+    ];
+    
+    dadosNovo.forEach(([label, valor]) => {
+      const linha = `${label} ${valor}`;
+      const linhasQuebradas = doc.splitTextToSize(linha, larguraColuna - 4);
+      doc.text(linhasQuebradas, coluna2X + 2, yPos);
+      yPos += 4.5;
+    });
+    
+    // Avança yPos para o maior valor das duas colunas + espaço extra para evitar sobreposição
+    yPos = yPosInicial + 42;
+    
+    // ===== RESULTADOS DA ANÁLISE =====
+    // Extrai valores dos resultados
+    const outputHTML = elementos.output.innerHTML;
+    const outputText = elementos.output.textContent;
+    
+    // Calcula altura necessária para o box (reduzida para caber na página)
+    const alturaBox = 100; // Altura ajustada para comportar todos os campos
+    
+    // Box de resultados
+    doc.setFillColor(240, 248, 255);
+    doc.roundedRect(margemEsq - 3, yPos - 3, larguraUtil + 6, alturaBox, 2, 2, 'F');
+    
+    doc.setFontSize(14);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(...corPrimaria);
+    doc.text('Resultados da Análise', margemEsq, yPos + 3);
+    yPos += 10;
+    
+    // === 1. FATORES DE AJUSTE EM DUAS COLUNAS ===
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(...corTexto);
+    doc.text('Fatores de Ajuste Aplicados', margemEsq, yPos);
+    yPos += 6;
+    
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'normal');
+    
+    // Extrair todos os fatores do texto
+    const fatorHorasMatch = outputText.match(/Fator de horas de uso: ([\d,\.]+)x/);
+    const deltaTMatch = outputText.match(/Delta T real: ([\d,\.]+)°C/);
+    const fatorDeltaMatch = outputText.match(/Fator delta T: ([\d,\.]+)x/);
+    const fatorTempMatch = outputText.match(/Fator temperatura externa: ([\d,\.]+)x/);
+    const fatorDegradacaoMatch = outputText.match(/Fator degradação \(idade\): ([\d,\.]+)x/);
+    const fatorManutencaoMatch = outputText.match(/Fator manutenção: ([\d,\.]+)x/);
+    
+    // Monta array com todos os fatores encontrados
+    const fatores = [];
+    if (fatorHorasMatch) fatores.push(`Fator de horas: ${fatorHorasMatch[1]}x`);
+    if (deltaTMatch) fatores.push(`Delta T real: ${deltaTMatch[1]} °C`);
+    if (fatorDeltaMatch) fatores.push(`Fator delta T: ${fatorDeltaMatch[1]}x`);
+    if (fatorTempMatch) fatores.push(`Fator temperatura: ${fatorTempMatch[1]}x`);
+    if (fatorDegradacaoMatch) fatores.push(`Fator degradação: ${fatorDegradacaoMatch[1]}x`);
+    if (fatorManutencaoMatch) fatores.push(`Fator manutenção: ${fatorManutencaoMatch[1]}x`);
+    
+    // Renderiza em duas colunas
+    const yPosInicialFatores = yPos;
+    const larguraColFatores = (larguraUtil - 4) / 2;
+    const coluna1XFatores = margemEsq + 2;
+    const coluna2XFatores = margemEsq + larguraColFatores + 4;
+    const metade = Math.ceil(fatores.length / 2);
+    
+    // Coluna 1
+    yPos = yPosInicialFatores;
+    for (let i = 0; i < metade; i++) {
+      doc.text(fatores[i], coluna1XFatores, yPos);
+      yPos += 4;
     }
     
+    // Coluna 2
+    yPos = yPosInicialFatores;
+    for (let i = metade; i < fatores.length; i++) {
+      doc.text(fatores[i], coluna2XFatores, yPos);
+      yPos += 4;
+    }
+    
+    // Avança yPos para a maior altura das colunas
+    yPos = yPosInicialFatores + (metade * 4) + 3;
+    
+    // === 2. CONSUMO ENERGÉTICO ===
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(...corTexto);
+    doc.text('Consumo Energético Anual', margemEsq, yPos);
+    yPos += 5;
+    
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'normal');
+    
+    const consumoAntigoMatch = outputText.match(/Aparelho atual \(antigo\): ([\d\.]+) kWh\/ano/);
+    const consumoNovoMatch = outputText.match(/Aparelho novo: ([\d\.]+) kWh\/ano/);
+    
+    if (consumoAntigoMatch) {
+      doc.text(`Aparelho atual: ${formatarNumero(parseFloat(consumoAntigoMatch[1]))} kWh/ano`, margemEsq + 2, yPos);
+      yPos += 4;
+    }
+    
+    if (consumoNovoMatch) {
+      doc.text(`Aparelho novo: ${formatarNumero(parseFloat(consumoNovoMatch[1]))} kWh/ano`, margemEsq + 2, yPos);
+      yPos += 4;
+    }
+    
+    yPos += 3;
+    
+    // === 3. ECONOMIA ESTIMADA ===
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(...corTexto);
+    doc.text('Economia Estimada', margemEsq, yPos);
+    yPos += 5;
+    
+    // Regex mais flexível para capturar economia anual
+    const economiaMatch = outputText.match(/Economia anual:\s*([\d\.,]+)\s*kWh\s*\(R\$\s*([\d\.,]+)\)/);
+    const paybackMatch = outputText.match(/Payback:\s*([\d,\.]+|>50 anos \(não compensa\)|>50)\s*anos/);
+    
+    if (economiaMatch) {
+      doc.setFontSize(9);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(...corSucesso);
+      const economiaKwh = economiaMatch[1].replace(',', '');
+      const economiaReais = economiaMatch[2];
+      doc.text(`Economia anual: ${economiaKwh} kWh (R$ ${economiaReais})`, margemEsq + 2, yPos);
+      yPos += 5;
+    }
+    
+    if (paybackMatch) {
+      let payback = paybackMatch[1];
+      let cor = corTexto;
+      let simbolo = '';
+      
+      // Limpa o texto do payback
+      if (payback.includes('nao compensa')) {
+        payback = '>50';
+        cor = corPerigo;
+        simbolo = '- ';
+      } else {
+        const paybackNum = parseFloat(payback.replace(',', '.'));
+        if (paybackNum > 8) {
+          cor = corPerigo;
+          simbolo = '- ';
+        } else if (paybackNum < 5) {
+          cor = corSucesso;
+          simbolo = '+ ';
+        }
+      }
+      
+      doc.setTextColor(...cor);
+      doc.setFontSize(9);
+      doc.setFont('helvetica', 'bold');
+      doc.text(`${simbolo}Payback: ${payback} anos`, margemEsq + 2, yPos);
+      yPos += 5;
+    }
+    
+    yPos += 3;
+    
+    // === 4. RECOMENDAÇÃO ===
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(...corTexto);
+    doc.text('Recomendação', margemEsq, yPos);
+    yPos += 6;
+    
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'bold');
+    
+    let recomendacao = '';
+    let corRecomendacao = corTexto;
+    
+    if (paybackMatch) {
+      const payback = paybackMatch[1];
+      if (payback === '>50' || payback.includes('não compensa') || parseFloat(payback.replace(',', '.')) > 8) {
+        recomendacao = 'Considere aguardar. Pode valer esperar uma promoção ou aumento na tarifa de energia.';
+        corRecomendacao = corAviso;
+      } else if (parseFloat(payback.replace(',', '.')) < 5) {
+        recomendacao = 'Troca recomendada em curto prazo. O investimento se paga rapidamente.';
+        corRecomendacao = corSucesso;
+      } else {
+        recomendacao = 'Investimento razoável. Payback moderado, avalie seu orçamento.';
+        corRecomendacao = corTexto;
+      }
+    }
+    
+    doc.setTextColor(...corRecomendacao);
+    const linhasRec = doc.splitTextToSize(recomendacao, larguraUtil - 4);
+    doc.text(linhasRec, margemEsq + 2, yPos);
+    
+    // ===== RODAPÉ PÁGINA 1 =====
+    doc.setDrawColor(200, 200, 200);
+    doc.setLineWidth(0.3);
+    doc.line(margemEsq, 280, margemDir, 280);
+    
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(...corTextoClaro);
+    doc.text('Calculadora de Economia em Ar-Condicionado', 105, 285, { align: 'center' });
+    doc.text('Página 1 de 2', margemDir, 285, { align: 'right' });
+    
+    // ===== PÁGINA 2: GRÁFICO EM LANDSCAPE =====
+    doc.addPage('a4', 'landscape');
+    
+    // Cabeçalho página 2
+    doc.setFillColor(...corPrimaria);
+    doc.rect(0, 0, 297, 25, 'F');
+    
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(16);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Análise de Sensibilidade', 20, 12);
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'normal');
+    doc.text('Impacto das horas de uso diário no tempo de retorno', 20, 19);
+    
+    // Gráfico em landscape (página toda)
+    if (graficoAtual) {
+      try {
+        const canvasImg = elementos.canvasGrafico.toDataURL('image/png', 1.0);
+        // Landscape: 297mm largura, 210mm altura
+        // Margens: 20mm cada lado
+        const largGrafico = 257; // 297 - 40
+        const altGrafico = 150;  // Proporção adequada
+        const xGrafico = 20;
+        const yGrafico = 35;
+        
+        doc.addImage(canvasImg, 'PNG', xGrafico, yGrafico, largGrafico, altGrafico);
+      } catch (e) {
+        console.warn('Não foi possível incluir gráfico no PDF:', e);
+        doc.setTextColor(...corTextoClaro);
+        doc.setFontSize(10);
+        doc.text('Gráfico não disponível', 148.5, 105, { align: 'center' });
+      }
+    }
+    
+    // Rodapé página 2
+    doc.setDrawColor(200, 200, 200);
+    doc.setLineWidth(0.3);
+    doc.line(20, 195, 277, 195);
+    
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(...corTextoClaro);
+    doc.text('Calculadora de Economia em Ar-Condicionado', 148.5, 200, { align: 'center' });
+    doc.text('Página 2 de 2', 277, 200, { align: 'right' });
+    
     // Salva o PDF
-    doc.save(`relatorio-ar-condicionado-${Date.now()}.pdf`);
+    const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+    doc.save(`relatorio-ar-condicionado-${timestamp}.pdf`);
+    
+    console.info('PDF gerado com sucesso!');
     
   } catch (erro) {
     console.error('Erro ao exportar PDF:', erro);
-    alert('Erro ao gerar PDF. Verifique se as bibliotecas necessárias foram carregadas.');
+    alert('Erro ao gerar PDF. Verifique se as bibliotecas necessarias foram carregadas.');
   }
 }
 
