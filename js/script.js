@@ -41,11 +41,26 @@ function calcular() {
     const unidade = document.getElementById(`unidade${prefix}`).value;
     let anual = padronizarAnual(consumoInput, unidade);
     if (!anual) anual = getDefaultAnual(btu, tipo, classe);
-    return anual * fatorHoras * fatorTemp;
-  }
+
+    let fatorDegradacao = 1;
+    if (prefix === 'Antigo') {
+        const idade = parseFloat(document.getElementById('idadeAntigo').value) || 10;
+        const taxa = tipo === 'onoff' ? 0.04 : 0.02; // 4% on-off, 2% inverter por ano após 2 anos
+        fatorDegradacao = idade > 2 ? 1 + (idade - 2) * taxa : 1;
+
+        const limpeza = document.getElementById('limpezaAntigo').value;
+        const manutencao = document.getElementById('manutencaoAntigo').value;
+        const fatorLimpeza = limpeza === 'pendente' ? 1.15 : 1.0;
+        const fatorManutencao = manutencao === 'pendente' ? 1.10 : 1.0;
+        const fatorExtra = fatorLimpeza * fatorManutencao;
+    }
+
+    return anual * fatorHoras * fatorTemp * fatorDegradacao * fatorExtra;
+}
 
   const consumoAntigo = getConsumoReal('Antigo');
   const consumoNovo = getConsumoReal('Novo');
+  const fatorDegradacaoAntigo = consumoAntigo / (consumoAntigo / fatorDegradacao); // não precisa recalcular, mas para exibir
 
   const economiaKwh = consumoAntigo - consumoNovo;
   const economiaReais = economiaKwh * precoKwh;
@@ -53,6 +68,11 @@ function calcular() {
 
   let msg = `Fator horas: ${fatorHoras.toFixed(2)} (uso ${fatorHoras > 1 ? 'mais intenso' : 'menos intenso'} que padrão Inmetro)\n`;
   msg += `Fator temperatura: ${fatorTemp.toFixed(2)}\n\n`;
+  msg += `Fator degradação aplicado ao antigo: ${fatorDegradacao.toFixed(2)} (idade ${idadeAntigo} anos, tipo ${tipoAntigo})\n`;
+  msg += `Fator extra (limpeza/manutenção): ${fatorExtra.toFixed(2)}\n`;
+  if (fatorExtra > 1.0) {
+    msg += `  Nota: Limpeza/manutenção pendente inflacionando o consumo em ${(fatorExtra - 1) * 100}%\n`;
+  }
   msg += `<strong>Consumo anual estimado antigo: ${consumoAntigo.toFixed(0)} kWh</strong>\n`;
   msg += `<strong>Consumo anual estimado novo: ${consumoNovo.toFixed(0)} kWh</strong>\n\n`;
   msg += `<strong class="success">Economia anual: ${economiaKwh.toFixed(0)} kWh (${economiaReais.toFixed(2)} R$)</strong>\n`;
@@ -92,7 +112,18 @@ function calcular() {
   });
 
   // Salvar
-  localStorage.setItem('calcData', JSON.stringify({ horasDia, mesesAno, area: document.getElementById('area').value, tempMin: document.getElementById('tempMin').value, tempMax: document.getElementById('tempMax').value, precoKwh, custoNovo }));
+  localStorage.setItem('calcData', JSON.stringify({ 
+    horasDia, 
+    mesesAno, 
+    area: document.getElementById('area').value, 
+    tempMin: document.getElementById('tempMin').value, 
+    tempMax: document.getElementById('tempMax').value, 
+    precoKwh, 
+    custoNovo,
+    idadeAntigo: document.getElementById('idadeAntigo').value,
+    limpezaAntigo: document.getElementById('limpezaAntigo').value,
+    manutencaoAntigo: document.getElementById('manutencaoAntigo').value
+  }));
 }
 
 window.onload = () => {
@@ -105,6 +136,9 @@ window.onload = () => {
     document.getElementById('tempMax').value = saved.tempMax;
     document.getElementById('precoKwh').value = saved.precoKwh;
     document.getElementById('custoNovo').value = saved.custoNovo;
+    document.getElementById('idadeAntigo').value = saved.idadeAntigo || 10;
+    document.getElementById('limpezaAntigo').value = saved.limpezaAntigo || 'emdia';
+    document.getElementById('manutencaoAntigo').value = saved.manutencaoAntigo || 'emdia';
   }
   if (localStorage.getItem('darkMode') === 'true') document.body.classList.add('dark');
 };
