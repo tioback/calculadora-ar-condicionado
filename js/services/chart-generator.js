@@ -93,6 +93,10 @@ export function gerarGraficoSensibilidade(resultados, graficoAtual, canvas) {
     }
   };
   
+  // Detectar se é mobile
+  const isMobile = window.innerWidth <= 768;
+  const isSmallMobile = window.innerWidth <= 480;
+  
   // Configuração do gráfico
   const novoGrafico = new Chart(ctx, {
     type: 'line',
@@ -106,9 +110,9 @@ export function gerarGraficoSensibilidade(resultados, graficoAtual, canvas) {
           backgroundColor: corPrimaria.replace('rgb', 'rgba').replace(')', ', 0.1)'),
           fill: false,
           tension: 0.3,
-          pointRadius: 5,
-          pointHoverRadius: 8,
-          borderWidth: 3,
+          pointRadius: isMobile ? 3 : 5,
+          pointHoverRadius: isMobile ? 6 : 8,
+          borderWidth: isMobile ? 2 : 3,
           yAxisID: 'y',
           spanGaps: false
         },
@@ -119,9 +123,9 @@ export function gerarGraficoSensibilidade(resultados, graficoAtual, canvas) {
           backgroundColor: corSucesso.replace('rgb', 'rgba').replace(')', ', 0.1)'),
           fill: false,
           tension: 0.3,
-          pointRadius: 4,
-          pointHoverRadius: 7,
-          borderWidth: 2,
+          pointRadius: isMobile ? 2 : 4,
+          pointHoverRadius: isMobile ? 5 : 7,
+          borderWidth: isMobile ? 1.5 : 2,
           borderDash: [5, 5],
           yAxisID: 'y1'
         }
@@ -129,7 +133,7 @@ export function gerarGraficoSensibilidade(resultados, graficoAtual, canvas) {
     },
     options: {
       responsive: true,
-      maintainAspectRatio: true,
+      maintainAspectRatio: false,
       interaction: {
         mode: 'index',
         intersect: false
@@ -138,31 +142,32 @@ export function gerarGraficoSensibilidade(resultados, graficoAtual, canvas) {
         zonasColoridas: pluginZonasColoridas,
         legend: {
           display: true,
-          position: 'top',
+          position: isMobile ? 'bottom' : 'top',
           labels: {
-            padding: 15,
+            padding: isMobile ? 8 : 15,
             usePointStyle: true,
-            font: { size: 12 }
+            font: { size: isSmallMobile ? 10 : (isMobile ? 11 : 12) },
+            boxWidth: isSmallMobile ? 30 : 40
           }
         },
         title: {
-          display: true,
+          display: !isSmallMobile,
           text: 'Análise de Sensibilidade: Impacto das Horas de Uso',
           font: {
-            size: 15,
+            size: isMobile ? 13 : 15,
             weight: '600'
           },
           padding: {
-            top: 10,
-            bottom: 15
+            top: isMobile ? 5 : 10,
+            bottom: isMobile ? 8 : 15
           }
         },
         tooltip: {
           backgroundColor: 'rgba(0, 0, 0, 0.8)',
-          padding: 12,
-          titleFont: { size: 13, weight: 'bold' },
-          bodyFont: { size: 12 },
-          bodySpacing: 6,
+          padding: isMobile ? 10 : 12,
+          titleFont: { size: isSmallMobile ? 11 : (isMobile ? 12 : 13), weight: 'bold' },
+          bodyFont: { size: isSmallMobile ? 10 : (isMobile ? 11 : 12) },
+          bodySpacing: isMobile ? 4 : 6,
           callbacks: {
             title: (context) => `${context[0].label}h de uso por dia`,
             label: (context) => {
@@ -205,16 +210,16 @@ export function gerarGraficoSensibilidade(resultados, graficoAtual, canvas) {
               xMin: horasUsuario,
               xMax: horasUsuario,
               borderColor: corPerigo,
-              borderWidth: 3,
+              borderWidth: isMobile ? 2 : 3,
               borderDash: [6, 3],
               label: {
-                display: true,
+                display: !isSmallMobile,
                 content: '⬇ Você está aqui',
                 position: 'start',
                 backgroundColor: corPerigo,
                 color: 'white',
-                font: { size: 11, weight: 'bold' },
-                padding: 6,
+                font: { size: isMobile ? 9 : 11, weight: 'bold' },
+                padding: isMobile ? 4 : 6,
                 borderRadius: 4
               }
             },
@@ -226,7 +231,7 @@ export function gerarGraficoSensibilidade(resultados, graficoAtual, canvas) {
               borderWidth: 1,
               borderDash: [3, 3],
               label: {
-                display: true,
+                display: !isMobile,
                 content: '5 anos',
                 position: 'end',
                 backgroundColor: 'transparent',
@@ -242,7 +247,7 @@ export function gerarGraficoSensibilidade(resultados, graficoAtual, canvas) {
               borderWidth: 1,
               borderDash: [3, 3],
               label: {
-                display: true,
+                display: !isMobile,
                 content: '8 anos',
                 position: 'end',
                 backgroundColor: 'transparent',
@@ -256,22 +261,26 @@ export function gerarGraficoSensibilidade(resultados, graficoAtual, canvas) {
       scales: {
         x: {
           title: {
-            display: true,
+            display: !isSmallMobile,
             text: 'Horas de uso por dia',
-            font: { size: 12, weight: '600' }
+            font: { size: isMobile ? 10 : 12, weight: '600' }
           },
           grid: {
             color: 'rgba(0, 0, 0, 0.06)',
             drawBorder: false
           },
-          ticks: { font: { size: 11 } }
+          ticks: { 
+            font: { size: isSmallMobile ? 9 : (isMobile ? 10 : 11) },
+            maxRotation: isMobile ? 45 : 0,
+            minRotation: isMobile ? 45 : 0
+          }
         },
         y: {
           position: 'left',
           title: {
-            display: true,
-            text: 'Tempo de retorno (anos)',
-            font: { size: 12, weight: '600' }
+            display: !isSmallMobile,
+            text: isMobile ? 'Payback (anos)' : 'Tempo de retorno (anos)',
+            font: { size: isMobile ? 10 : 12, weight: '600' }
           },
           beginAtZero: true,
           max: 20,
@@ -280,16 +289,14 @@ export function gerarGraficoSensibilidade(resultados, graficoAtual, canvas) {
             drawBorder: false
           },
           ticks: {
-            font: { size: 11 },
-            callback: (value) => value + ' anos'
+            font: { size: isSmallMobile ? 9 : (isMobile ? 10 : 11) },
+            callback: (value) => value + (isMobile ? 'a' : ' anos')
           }
         },
         y1: {
           position: 'right',
           title: {
-            display: true,
-            text: 'Economia anual (R$)',
-            font: { size: 12, weight: '600' }
+            display: false
           },
           beginAtZero: true,
           grid: {
@@ -297,8 +304,8 @@ export function gerarGraficoSensibilidade(resultados, graficoAtual, canvas) {
             drawBorder: false
           },
           ticks: {
-            font: { size: 11 },
-            callback: (value) => 'R$ ' + value.toFixed(0)
+            font: { size: isSmallMobile ? 9 : (isMobile ? 10 : 11) },
+            callback: (value) => isMobile ? 'R$' + (value/1000).toFixed(0) + 'k' : 'R$ ' + value.toFixed(0)
           }
         }
       }

@@ -374,11 +374,22 @@
     <section class="card" aria-labelledby="titulo-grafico">
       <h2 id="titulo-grafico">Análise de Sensibilidade</h2>
       <p class="chart-description">Impacto das horas diárias de uso no tempo de retorno do investimento</p>
-      <canvas 
-        id="graficoPayback" 
-        role="img" 
-        aria-label="Gráfico de linha mostrando o payback em anos versus horas de uso por dia">
-      </canvas>
+      
+      <!-- Mensagem para rotação em mobile portrait -->
+      <div class="rotate-message" id="rotateMessage">
+        <div class="rotate-icon">📱</div>
+        <h3>Gire seu dispositivo</h3>
+        <p>Para visualizar o gráfico completo, por favor gire seu dispositivo para o modo paisagem.</p>
+        <div class="rotate-animation">↻</div>
+      </div>
+      
+      <div class="chart-container" id="chartContainer">
+        <canvas 
+          id="graficoPayback" 
+          role="img" 
+          aria-label="Gráfico de linha mostrando o payback em anos versus horas de uso por dia">
+        </canvas>
+      </div>
     </section>
   </main>
 

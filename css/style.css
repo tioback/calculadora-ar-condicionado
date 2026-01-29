@@ -533,9 +533,82 @@ button:active:not(:disabled) {
 /* ===================================
    GRÁFICO
    =================================== */
+.chart-container {
+  position: relative;
+  width: 100%;
+  height: 450px;
+  margin: var(--spacing-md) 0;
+}
+
+#graficoPayback {
+  max-width: 100%;
+  height: auto !important;
+  width: 100% !important;
+}
+
 canvas {
   max-width: 100%;
   height: auto;
+}
+
+/* Container do gráfico */
+.card canvas {
+  margin: var(--spacing-md) 0;
+}
+
+/* Mensagem de rotação (oculta por padrão) */
+.rotate-message {
+  display: none;
+  text-align: center;
+  padding: var(--spacing-xl);
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  border-radius: 12px;
+  margin: var(--spacing-md) 0;
+}
+
+.rotate-message .rotate-icon {
+  font-size: 4rem;
+  margin-bottom: var(--spacing-md);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.rotate-message h3 {
+  color: var(--color-primary);
+  font-size: var(--font-size-lg);
+  margin-bottom: var(--spacing-sm);
+}
+
+.rotate-message p {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-base);
+  margin-bottom: var(--spacing-md);
+  line-height: 1.6;
+}
+
+.rotate-animation {
+  font-size: 3rem;
+  color: var(--color-primary);
+  animation: rotate 2s linear infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.8;
+  }
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* ===================================
@@ -580,6 +653,48 @@ canvas {
   .input-group select {
     width: 100%;
   }
+  
+  /* Ajustes para gráfico em tablets */
+  .chart-description {
+    font-size: var(--font-size-sm);
+    margin-bottom: var(--spacing-sm);
+  }
+  
+  .chart-container {
+    height: 380px;
+  }
+  
+  #graficoPayback {
+    min-height: 300px;
+  }
+}
+
+/* Mobile Portrait - Mostrar mensagem de rotação */
+@media (max-width: 768px) and (orientation: portrait) {
+  .rotate-message {
+    display: block;
+  }
+  
+  .chart-container {
+    display: none;
+  }
+}
+
+/* Mobile Landscape - Mostrar gráfico */
+@media (max-width: 768px) and (orientation: landscape) {
+  .rotate-message {
+    display: none;
+  }
+  
+  .chart-container {
+    display: block;
+    height: 320px;
+  }
+  
+  .chart-description {
+    font-size: var(--font-size-sm);
+    margin-bottom: var(--spacing-xs);
+  }
 }
 
 @media (max-width: 480px) {
@@ -593,6 +708,49 @@ canvas {
   
   label {
     font-size: var(--font-size-sm);
+  }
+  
+  .card h2 {
+    font-size: var(--font-size-md);
+  }
+  
+  /* Melhorar espaçamento em mobile */
+  .card {
+    padding: var(--spacing-sm);
+  }
+  
+  /* Mensagem de rotação em telas pequenas */
+  .rotate-message {
+    padding: var(--spacing-lg);
+  }
+  
+  .rotate-message .rotate-icon {
+    font-size: 3rem;
+  }
+  
+  .rotate-message h3 {
+    font-size: var(--font-size-base);
+  }
+  
+  .rotate-message p {
+    font-size: var(--font-size-sm);
+  }
+  
+  .rotate-animation {
+    font-size: 2.5rem;
+  }
+}
+
+/* Mobile pequeno em landscape */
+@media (max-width: 480px) and (orientation: landscape) {
+  .chart-container {
+    height: 280px;
+  }
+  
+  .chart-description {
+    font-size: 0.8rem;
+    line-height: 1.3;
+    margin-bottom: var(--spacing-xs);
   }
 }
 

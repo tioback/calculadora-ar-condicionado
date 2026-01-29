@@ -1661,7 +1661,68 @@ function inicializar() {
 
   resetarMemoriaCalculo();
   
+  // Configurar detecção de orientação para dispositivos móveis
+  configurarDeteccaoOrientacao();
+  
   console.info('✅ Calculadora de Ar-Condicionado inicializada com sucesso!');
+}
+
+/**
+ * Configura a detecção de mudança de orientação em dispositivos móveis
+ * Atualiza a visualização do gráfico quando o usuário gira o dispositivo
+ */
+function configurarDeteccaoOrientacao() {
+  // Verifica se é um dispositivo móvel
+  const isMobile = window.innerWidth <= 768;
+  
+  if (!isMobile) return;
+  
+  const rotateMessage = document.getElementById('rotateMessage');
+  const chartContainer = document.getElementById('chartContainer');
+  
+  if (!rotateMessage || !chartContainer) return;
+  
+  /**
+   * Atualiza a visibilidade do gráfico baseado na orientação
+   */
+  function atualizarVisibilidadeGrafico() {
+    const isPortrait = window.innerHeight > window.innerWidth;
+    const isMobileSize = window.innerWidth <= 768;
+    
+    if (isMobileSize && isPortrait) {
+      // Mobile em modo retrato: mostrar mensagem
+      rotateMessage.style.display = 'block';
+      chartContainer.style.display = 'none';
+    } else {
+      // Mobile em modo paisagem ou desktop: mostrar gráfico
+      rotateMessage.style.display = 'none';
+      chartContainer.style.display = 'block';
+      
+      // Se o gráfico existe e foi calculado, redesenhá-lo após mudança de orientação
+      if (graficoAtual && window.innerWidth <= 768) {
+        setTimeout(() => {
+          if (graficoAtual) {
+            graficoAtual.resize();
+          }
+        }, 300); // Aguarda a animação de rotação completar
+      }
+    }
+  }
+  
+  // Atualizar no carregamento
+  atualizarVisibilidadeGrafico();
+  
+  // Detectar mudança de orientação
+  window.addEventListener('orientationchange', () => {
+    setTimeout(atualizarVisibilidadeGrafico, 100);
+  });
+  
+  // Detectar redimensionamento (fallback para navegadores sem orientationchange)
+  let resizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(atualizarVisibilidadeGrafico, 150);
+  });
 }
 
 // Inicializa quando o DOM estiver pronto
