@@ -92,12 +92,6 @@ Modelos inverter modernos (classe A ou A++) tipicamente consomem 30–60 % menos
     -   Payback = Custo\_novo / Economia\_anual
     -   Exemplo: R$ 5.000 ÷ R$ 1.188 ≈ 4,2 anos.
 
-### O que você deve sentir/experimentar ao fazer essa análise
-
--   No passo 1 (consumo real): frustração ou surpresa se o valor for muito maior que o padronizado — isso é comum em casas com pouca vedação, sol direto nas paredes/janelas ou uso contínuo 12–16 h/dia.
--   Ao comparar: sensação de clareza quando o fator fica entre 1,1 e 1,6 — uso real mais intenso que o laboratório, mas previsível.
--   No payback: alívio prático se ficar abaixo de 5–6 anos, irritação se ultrapassar 8–10 anos (aí vale esperar promoção ou mudança de tarifa).
-
 ### Limitações importantes (não ignore)
 
 -   O consumo padronizado do Inmetro é em condições ideais de teste. Em dias muito quentes (>38 °C), a diferença real pode ser menor que a estimada (o aparelho antigo sofre mais).
@@ -137,7 +131,7 @@ Sim, é possível fazer uma comparação útil e razoável usando apenas esses d
 
 O processo não é exato como uma medição com medidor dedicado, mas chega perto o suficiente (±20–30% de erro) para decidir se a troca vale financeiramente. A etiqueta Inmetro fornece o consumo padronizado baseado em condições fixas de teste (2080 horas/ano, média de ~5,7 horas/dia, temperatura externa ~35 °C, interna ~27 °C), então ajustamos proporcionalmente ao seu uso real.
 
-Aqui está o método prático, passo a passo, com observações sobre o que você deve notar ao aplicar.
+Aqui está o método prático, passo a passo.
 
 1.  **Verifique o dimensionamento do aparelho antigo (BTU vs área refrigerada)** 
 
@@ -145,12 +139,6 @@ Aqui está o método prático, passo a passo, com observações sobre o que voc�
     
     -   600–800 BTU/h por m² de área total (incluindo pé-direito padrão de 2,4–2,7 m).
     -   Ajustes: +400–600 BTU por pessoa fixa no ambiente; +300–500 BTU por eletrônicos/aparelhos que geram calor; +10–20% se muitas janelas sem cortina ou parede exposta ao sol. Exemplo: quarto de 15 m² → 9.000–12.000 BTU ideal. Se seu antigo for 9.000 BTU para 20 m², ele está subdimensionado.
-    
-    O que você deve sentir/experimentar:
-    
-    -   Se subdimensionado: o aparelho nunca "descanse" (compressor sempre ligado ou ciclos curtos), ambiente demora a atingir temperatura desejada, sensação de ar "quente" mesmo ligado há horas.
-    -   Se superdimensionado: ciclos rápidos on/off, temperatura oscila muito, consumo alto por ineficiência.
-    -   Dimensionado ok: compressor liga/desliga com calma, ambiente estabiliza em ~30–60 min.
 
 2.  **Calcule as horas de uso reais mensais** 
     
@@ -172,11 +160,6 @@ Aqui está o método prático, passo a passo, com observações sobre o que voc�
     
     -   Isso assume que o consumo é razoavelmente proporcional às horas (bom para on-off antigo).
     -   Ajuste qualitativo pela temperatura externa: Teste Inmetro é em ~35 °C externa. Em SC, verão típico 28–35 °C dia, 22–26 °C noite. Se média diária externa for 3–5 °C abaixo de 35 °C, reduza estimativa em 10–20% (menos carga térmica). Se acima, aumente. Analogia: é como pedalar morro acima (alta temp externa = mais esforço/consumo) vs plano.
-    
-    O que você deve sentir/experimentar:
-    
-    -   Ao calcular: surpresa se consumo estimado for alto (ex: >300 kWh/mês para 12.000 BTU com 10 h/dia) — comum em uso intenso + isolamento ruim.
-    -   Se temp externa média baixa: sensação de "alívio" ao ver estimativa cair.
 5.  **Repita para o modelo novo que você considera**
     
     -   Pegue consumo padronizado mensal/anual da etiqueta (site fabricante ou loja).
@@ -196,12 +179,6 @@ Aqui está o método prático, passo a passo, com observações sobre o que voc�
     Economia R$/ano = economia kWh/ano × tarifa. 
     
     Payback = preço novo / economia anual (em anos).
-    
-    O que você deve sentir/experimentar:
-    
-    -   Se payback <4–5 anos: sensação prática de "decisão óbvia".
-    -   Se >7–8 anos: observação de que vale esperar promoção ou tarifa alta no verão.
-    -   Processo sistemático dá clareza: números frios mostram se o antigo está "sangrando" energia.
 
 Limitações observadas:
 
@@ -227,11 +204,6 @@ Sim, para criar uma página web funcional que faça exatamente esse cálculo de 
 
 Isso resulta em uma aplicação **client-side** (roda inteira no navegador do usuário), leve, rápida e sem custo de hospedagem além de um servidor estático simples (GitHub Pages, Vercel, Netlify etc. são grátis). É o caminho mais direto e prático para um protótipo útil.
 
-O que você deve sentir/experimentar ao construir ou usar algo assim:
-
--   No início: sensação de controle imediato — você digita os números reais do seu caso e vê o resultado em segundos, sem esperar por ninguém.
--   Durante o uso: clareza analítica, como um painel de instrumentos que mostra “seu uso é 1,4× o padrão Inmetro” — o fator de ajuste aparece numericamente, sem mistério.
--   Ao testar variações: curiosidade prática, tipo “e se eu reduzir 2 horas por dia?” — muda o payback visivelmente, como um simulador de cenários.
 
 ### Tecnologias necessárias (mínimo viável)
 
@@ -283,14 +255,12 @@ O que você deve sentir/experimentar ao construir ou usar algo assim:
     -   Payback (anos)
     -   Mensagem condicional: “Troca vale em <5 anos” ou “Espere promoção”
 
-### Limitações e o que pode sentir
+### Limitações
 
 -   Sem backend: tudo roda no cliente — dados não ficam salvos em servidor, não tem login, não consulta API Inmetro automaticamente.
-    -   Sensação: liberdade (não depende de ninguém), mas também isolamento (você mesmo atualiza os valores Inmetro manualmente).
 -   Dados Inmetro mudam: etiquetas evoluem (ex: IDRS desde 2023), então hardcode não é ideal a longo prazo.
     -   Solução simples: usuário cola o valor da etiqueta.
 -   Precisão: cálculos lineares aproximam bem, mas não modelam comportamento inverter real (ex: eficiência em carga parcial).
-    -   Sensação: aceitável para decisão prática, mas não para engenharia precisa.
 
 ### Extensões se quiser ir além (ainda client-side)
 
@@ -346,10 +316,6 @@ Passos na calculadora:
 -   Consumo real estimado = consumo\_etiqueta\_anual × fator × fator\_temp (ajuste por temp externa média vs 35 °C).
 -   Isso permite comparar antigo e novo diretamente, mesmo misturados.
 
-O que você deve sentir/experimentar:
-
--   Ao selecionar tipo de etiqueta: sensação de "encaixe" imediato — se o aparelho for de 2025+, nova etiqueta cai como luva; se antigo, você percebe que o cálculo "penaliza" o on-off antigo (consumo alto), o que reflete a realidade.
-
 ### Ajuste para máximo de informações + defaults quando faltando
 
 Sim, faça campos opcionais com fallback para valores médios observados (baseados em dados Inmetro 2025, exemplos de modelos split comuns). Se o usuário não preencher consumo, calcule default baseado em:
@@ -385,11 +351,6 @@ Outros defaults:
 -   Horas/mês padrão: 173 (2080/12).
 -   Preço kWh: 0.90 R$ (SC média; usuário ajusta).
 -   Meses uso: 6 (verão SC; opcional).
-
-O que você deve sentir/experimentar:
-
--   Quando um campo fica vazio: alívio ao ver o default preencher automaticamente com valor plausível — não trava, continua calculando.
--   Ao comparar: clareza sistemática — "seu antigo on-off classe D em 12k BTU defaulta 2100 kWh/ano; novo A inverter cai para 1050" — processo mostra o impacto da tecnologia.
 
 ### Implementação completa da solução (client-side puro)
 
@@ -431,11 +392,6 @@ Basta HTML + CSS + JS. Adicione extensões sugeridas:
 6.  Vá em Settings > Pages > Source: Branch "main" (ou master) → Root → Save.
 7.  Aguarde 1–2 min; URL aparece: [https://seuusuario.github.io/calculadora-ar-condicionado/](https://seuusuario.github.io/calculadora-ar-condicionado/)
 8.  Atualize arquivos: edite online ou git push se clonar local.
-
-O que você deve sentir/experimentar ao montar:
-
--   Processo metódico — cada commit testa funcionalidade parcial (ex: primeiro form sem JS, depois cálculos, depois gráficos).
--   Ao hospedar: satisfação prática de "está online para qualquer um testar" sem custo.
 
 Se quiser, forneça preferências exatas de defaults ou campos, e descrevo/esboço código completo (HTML/JS) na próxima.
 
@@ -720,13 +676,6 @@ Aqui está a versão aprimorada da calculadora. Fiz melhorias sistemáticas no v
 4.  **Resultados**: Apresentados em cards com ícones (usando emoji simples, sem dependências extras). Texto formatado com negrito e cores para destaque.
 5.  **Gráfico**: Chart.js com título, legendas, eixos rotulados, tooltip customizado. Linha agora tem label "Payback vs Horas/dia".
 6.  **Outras UX**: Botões maiores e hover effects. Salvamento automático no localStorage expandido (mais campos). PDF com cabeçalho e formatação melhor.
-
-O que você deve sentir/experimentar ao abrir a nova versão:
-
--   Ao carregar: sensação de profissionalismo imediato — layout limpo, como um app moderno, não "coisa de amador".
--   Ao preencher: fluidez — inputs respondem bem, erros destacados sem irritar.
--   Nos resultados: clareza visual — economia em verde destaca o benefício; payback em vermelho se alto.
--   No gráfico: legibilidade — linhas e eixos explicados, fácil ver impacto de mais/menos horas.
 
 **Atualizações nos arquivos** (substitua os antigos no seu repositório GitHub):
 
@@ -1021,8 +970,6 @@ O desempenho (eficiência energética e capacidade de refrigeração) degrada co
 
 Em resumo: um aparelho de 20 anos tipicamente consome 40–100% mais energia para entregar a mesma refrigeração que um de 2 anos, dependendo do tipo e manutenção. Isso é observável em contas de luz e medições reais, não é especulação.
 
-O que você deve sentir/experimentar: Ao notar que o antigo demora mais para gelar, o compressor fica ligado quase sempre ou a conta subiu sem motivo aparente de uso/temperatura, é sinal clássico de degradação acumulada — não é "o calor está pior", é o sistema trabalhando ineficiente.
-
 ### Ajustes no formulário e cálculos
 
 Adicionei um campo "Idade do aparelho antigo (anos)" no fieldset Antigo (obrigatório, default 10 anos).
@@ -1124,11 +1071,6 @@ Sim, os fatores de limpeza e manutenção precisam ser incluídos porque impacta
 -   **Manutenção pendente** (vazamentos não corrigidos, gás baixo, contatos oxidados, drenagem entupida): Causa perda de eficiência adicional (vazamento +5–20%, drenagem ruim +5–10%). Média conservadora: +10% se pendente.
 -   **Combinação**: Efeitos são multiplicativos (não aditivos), pois sujeira agrava vazamentos e vice-versa. Total pode chegar a +25–40% se ambos pendentes.
 -   Analogia: é como dirigir um carro com filtro de ar sujo e óleo baixo — o motor consome mais combustível para entregar a mesma potência, independentemente da quilometragem.
-
-O que você deve sentir/experimentar ao adicionar esses campos:
-
--   Ao selecionar "Pendente": sensação de "explicação racional" para contas altas — não é só idade, mas negligência acumulada.
--   No resultado: clareza ao ver o fator extra (ex: 1.25) multiplicando o consumo — processo mostra o custo real da falta de cuidado, como um termômetro de manutenção.
 
 ### Ajustes no formulário e cálculos
 
@@ -1574,11 +1516,6 @@ A temperatura interna configurada (setpoint) afeta diretamente o consumo porque 
 -   Analogia: é como manter uma geladeira com porta aberta — quanto maior a diferença de temperatura com o ambiente externo, mais o compressor trabalha para compensar.
 -   Se delta T for pequeno ou negativo (ex: externa 20–24 °C, setpoint 24 °C), o aparelho liga menos ou em baixa potência (inverter ganha mais aqui).
 -   Impacto prático: diferença de 2–3 °C no setpoint pode alterar consumo em 10–30% em uso real, especialmente em dias quentes.
-
-O que você deve sentir/experimentar ao ajustar o setpoint:
-
--   Ao baixar de 24 °C para 22 °C: sensação de "ar mais frio rápido", mas compressor fica ligado mais tempo ou em alta velocidade → conta de luz sobe notavelmente.
--   Ao subir para 26 °C: ambiente "menos gelado", mas sensação de conforto sustentável (menos oscilações), compressor descansa mais → economia perceptível em horas prolongadas.
 
 ### Ajustes implementados
 
@@ -2286,19 +2223,16 @@ A taxa de erro atual na calculadora (estimada em ±15–30% no consumo real proj
     -   Instale um medidor de energia plug (ex: Kill-A-Watt, Sonoff POW ou app de medidor inteligente) na tomada do aparelho antigo por pelo menos 1–2 meses completos (ideal: um verão inteiro).
     -   Registre consumo diário/mensal real (kWh) vs horas ligadas, setpoint, temp externa média (use termômetro externo ou app de clima).
     -   Por quê: Isso substitui os fatores aproximados (horas, delta T, degradação) por dados calibrados. Erro cai para <10% só com isso.
-    -   O que você deve sentir/experimentar: Surpresa inicial ao ver o consumo real (muitas vezes 20–50% maior que etiqueta antiga), depois clareza — os números param de ser "teóricos" e viram "meus números".
 2.  **Dados exatos do aparelho (não defaults)**
     -   Para antigo: preencha consumo da etiqueta (como no seu caso de 2010: 17,2 kWh/mês → anual 206,4 kWh) + BTU exato + modelo completo.
     -   Para novo: baixe ficha técnica do fabricante (não só etiqueta Inmetro) — procure COP/IDRS real em cargas parciais (ex: 50% carga consome 30–40% menos que full-load em inverter).
     -   Por quê: Defaults genéricos (ex: 450 kWh/ano para 12k BTU classe A) variam ±20%; dados exatos reduzem isso para ±5–10%.
-    -   O que você deve sentir/experimentar: Sensação de precisão ao ver o cálculo "encaixar" melhor com medição real — menos "aproximação grosseira".
 3.  **Modelo não-linear para inverter**
     -   Atual: fator linear (horas × delta T × etc.).
     -   Necessário: curva de consumo vs carga parcial (inverter consome proporcionalmente menos em delta T baixo).
     -   Implementação: Adicionar tabela de eficiência por faixa de delta T (ex: <5 °C: fator 0.6; 5–10 °C: 1.0; >10 °C: 1.3 para inverter; on-off mais linear).
     -   Fonte: dados de fabricantes ou testes laboratoriais (ex: Procel/INMETRO relatórios).
     -   Por quê: Inverter moderno ganha 20–40% em cargas parciais vs on-off antigo — linear subestima economia.
-    -   O que você deve sentir/experimentar: Alívio ao ver payback encurtar realisticamente em uso moderado (ex: setpoint 26 °C vs 22 °C).
 4.  **Fatores adicionais de carga térmica**
     -   Incluir:
         -   Umidade relativa média (alta umidade aumenta carga latente → +10–20%).
@@ -2306,12 +2240,10 @@ A taxa de erro atual na calculadora (estimada em ±15–30% no consumo real proj
         -   Carga interna (pessoas, eletrônicos → +100–300 BTU/h por pessoa).
     -   Implementação: Campos opcionais no form + multiplicadores (ex: umidade >70%: ×1.15).
     -   Por quê: Etiqueta Inmetro testa em condições controladas; casa real varia muito.
-    -   O que você deve sentir/experimentar: Frustração inicial se adicionar esses campos aumentar consumo antigo, mas depois satisfação — explica por que conta é mais alta que projeção simples.
 5.  **Validação e calibração iterativa**
     -   Após medição real: ajuste fatores manualmente até consumo projetado = real (ex: fator calibração = real / projetado).
     -   Salve no localStorage ou adicione campo "Fator de calibração" (default 1.0).
     -   Por quê: Elimina viés sistemático (ex: sua casa tem isolamento ruim → fator >1.2).
-    -   O que você deve sentir/experimentar: Processo metódico como engenharia — ajuste, teste, recalibre — erro cai para ±5% após 1–2 ciclos.
 
 ### Resumo prático: Caminho para ±5%
 
