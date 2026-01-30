@@ -429,6 +429,9 @@ Nenhum dado específico está faltando para esta versão inicial — os defaults
 
 ### index.html
 
+<details>
+    <summary>(clique para expandir)</summary>
+    
 ```html
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -525,8 +528,12 @@ button:hover { opacity: 0.9; }
 .error { color: var(--error); }
 canvas { max-width: 100%; margin-top: 1em; }
 ```
+</details>
 
 ### script.js
+
+<details>
+    <summary>(clique para expandir)</summary>
 
 ```JavaScript
 const defaultsConsumo = {
@@ -646,6 +653,9 @@ document.getElementById('exportPdf').addEventListener('click', () => {
   doc.save('relatorio-ar.pdf');
 });
 ```
+</details>
+
+<br />
 
 **Observações observadas:**
 
@@ -680,6 +690,9 @@ Aqui está a versão aprimorada da calculadora. Fiz melhorias sistemáticas no v
 **Atualizações nos arquivos** (substitua os antigos no seu repositório GitHub):
 
 ### index.html (atualizado)
+
+<details>
+    <summary>(clique para expandir)</summary>
 
 ```HTML
 <!DOCTYPE html>
@@ -796,8 +809,12 @@ body.dark .card { background: #2c2c2c; }
 #output .high { color: var(--danger); }
 canvas { max-width: 100%; }
 ```
+</details>
 
 ### script.js (atualizado – gráfico melhorado)
+
+<details>
+    <summary>(clique para expandir)</summary>
 
 ```JavaScript
 const defaultsConsumo = {
@@ -927,6 +944,9 @@ document.getElementById('exportPdf').addEventListener('click', () => {
   doc.save('economia-ar-condicionado.pdf');
 });
 ```
+</details>
+
+<br />
 
 **Próximos passos práticos**:
 
@@ -994,6 +1014,9 @@ O layout já usa CSS Grid responsivo (repeat(auto-fit, minmax(300px, 1fr))), que
 
 #### script.js (atualizado – adicione no topo das funções e ajuste getConsumoReal)
 
+<details>
+    <summary>(clique para expandir)</summary>
+
 ```JavaScript
 // ... (manter o resto igual)
 
@@ -1035,6 +1058,7 @@ localStorage.setItem('calcData', JSON.stringify({
   idadeAntigo: document.getElementById('idadeAntigo').value
 }));
 ```
+</details>
 
 #### style.css (adicionar para melhor responsividade em mobile)
 
@@ -1169,6 +1193,9 @@ Copie cada arquivo inteiro e substitua os anteriores no seu repositório GitHub.
 
 ### index.html
 
+<details>
+    <summary>(clique para expandir)</summary>
+
 ```HTML
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -1239,8 +1266,12 @@ Copie cada arquivo inteiro e substitua os anteriores no seu repositório GitHub.
 </body>
 </html>
 ```
+</details>
 
 ### style.css
+
+<details>
+    <summary>(clique para expandir)</summary>
 
 ```CSS
 :root {
@@ -1294,8 +1325,12 @@ canvas { max-width: 100%; }
   label { margin: 1.2em 0; }
 }
 ```
+</details>
 
 ### script.js
+
+<details>
+    <summary>(clique para expandir)</summary>
 
 ```JavaScript
 const defaultsConsumo = {
@@ -1483,6 +1518,9 @@ document.getElementById('exportPdf').addEventListener('click', () => {
   doc.save('economia-ar-condicionado.pdf');
 });
 ```
+</details>
+
+<br />
 
 Esses arquivos são autônomos e devem rodar diretamente ao abrir index.html no navegador ou no GitHub Pages. Se precisar de mais campos ou ajustes nos defaults/fatores, forneça valores específicos do seu caso.
 
@@ -1533,6 +1571,9 @@ Cálculo atualizado:
 Arquivos atualizados na íntegra (substitua os anteriores no GitHub).
 
 ### index.html
+
+<details>
+    <summary>(clique para expandir)</summary>
 
 ```HTML
 <!DOCTYPE html>
@@ -1605,63 +1646,12 @@ Arquivos atualizados na íntegra (substitua os anteriores no GitHub).
 </body>
 </html>
 ```
-
-### style.css
-
-```CSS
-:root {
-  --bg: #f8f9fa;
-  --text: #212529;
-  --primary: #0056b3;
-  --success: #28a745;
-  --warning: #ffc107;
-  --danger: #dc3545;
-  --border: #dee2e6;
-  --shadow: 0 4px 6px rgba(0,0,0,0.1);
-}
-body.dark {
-  --bg: #1e1e1e;
-  --text: #e0e0e0;
-  --primary: #4da6ff;
-  --border: #444;
-}
-body {
-  font-family: system-ui, -apple-system, sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  margin: 0;
-  padding: 20px;
-  line-height: 1.6;
-}
-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2em; }
-h1 { margin: 0; font-size: 1.8em; }
-h2 { margin: 0.5em 0; font-size: 1.3em; }
-.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5em; }
-fieldset { border: 1px solid var(--border); border-radius: 8px; padding: 1.5em; background: white; box-shadow: var(--shadow); }
-body.dark fieldset { background: #2c2c2c; }
-legend { font-weight: bold; padding: 0 0.5em; background: var(--bg); }
-label { display: flex; flex-direction: column; margin: 1em 0; }
-input, select { padding: 0.75em; border: 1px solid var(--border); border-radius: 4px; font-size: 1em; }
-input:invalid { border-color: var(--danger); }
-.actions { grid-column: 1 / -1; text-align: center; }
-button { padding: 0.8em 1.5em; background: var(--primary); color: white; border: none; border-radius: 4px; cursor: pointer; margin: 0.5em; }
-button:hover { opacity: 0.9; }
-.card { background: white; border-radius: 8px; padding: 1.5em; box-shadow: var(--shadow); grid-column: 1 / -1; }
-body.dark .card { background: #2c2c2c; }
-#output { white-space: pre-wrap; }
-#output strong { color: var(--success); }
-#output .high { color: var(--danger); }
-canvas { max-width: 100%; }
-
-@media (max-width: 600px) {
-  .grid { grid-template-columns: 1fr; }
-  input, select { width: 100%; }
-  button { width: 100%; margin: 0.5em 0; }
-  label { margin: 1.2em 0; }
-}
-```
+</details>
 
 ### script.js
+
+<details>
+    <summary>(clique para expandir)</summary>
 
 ```JavaScript
 const defaultsConsumo = {
@@ -1858,6 +1848,9 @@ document.getElementById('exportPdf').addEventListener('click', () => {
   doc.save('economia-ar-condicionado.pdf');
 });
 ```
+</details>
+
+<br />
 
 Processo sistemático: O fator\_delta é linear em relação ao delta T (proporcional à carga), com piso para cenários de baixa carga. Isso é uma aproximação prática (não modela umidade ou carga latente), mas captura bem o efeito dominante observado em dados de campo. Teste variando setpoint: de 22 °C para 26 °C deve reduzir consumos estimados visivelmente, encurtando payback se delta T alto.
 
@@ -1869,7 +1862,9 @@ Processo sistemático: O fator\_delta é linear em relação ao delta T (proporc
 
 #### Prompt 11 (Usuário)
 
-Um detalhe, estou armazenando os arquivos css e js em pastas específicas, então considere suas referências no index.html como sendo css/style.css e js/script.js. Outro detalhe, a legenda horizontal do gráfico deve ser alterada para: Horas de Uso/dia Forneça na íntegra apenas os arquivos que forem modificados, por favor.
+Um detalhe, estou armazenando os arquivos css e js em pastas específicas, então considere suas referências no index.html como sendo css/style.css e js/script.js.
+
+Outro detalhe, a legenda horizontal do gráfico deve ser alterada para: Horas de Uso/dia Forneça na íntegra apenas os arquivos que forem modificados, por favor.
 
 #### Resposta 11 (Grok)
 
@@ -1884,6 +1879,8 @@ Apenas dois arquivos precisam ser substituídos: **index.html** e **script.js**.
 
 ### index.html (atualizado – com caminhos para pastas css/ e js/)
 
+<details>
+    <summary>(clique para expandir)</summary>
 ```HTML
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -1955,8 +1952,12 @@ Apenas dois arquivos precisam ser substituídos: **index.html** e **script.js**.
 </body>
 </html>
 ```
+</details>
 
 ### script.js (atualizado – legenda do eixo x alterada)
+
+<details>
+    <summary>(clique para expandir)</summary>
 
 ```JavaScript
 const defaultsConsumo = {
@@ -2153,6 +2154,8 @@ document.getElementById('exportPdf').addEventListener('click', () => {
 });
 ```
 
+</details>
+<br/>
 Substitua apenas esses dois arquivos na sua estrutura de pastas (css/ e js/). O gráfico agora mostra "Horas de Uso/dia" no eixo horizontal, conforme solicitado. Se precisar de mais refinamentos, informe os próximos passos observados.
 
 ---
